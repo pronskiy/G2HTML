@@ -82,13 +82,13 @@ To customize any settings that are not visible in the plugin UI, download the `g
     <p><a class="jb-download-button" href="some url"><i class="download-icon"></i>Download My IDE!</a></p>
 ```
     
-    **Suggestion**: as some typical text elements (like links) are handled by the general parser logic, it's not recommended to alter them via templates for now. There is no easy way to simplify the example above - the only way to have the correct template for you is to configure it once for your product. 
+**Suggestion**: as some typical text elements (like links) are handled by the general parser logic, it's not recommended to alter them via templates for now. There is no easy way to simplify the example above - the only way to have the correct template for you is to configure it once for your product. 
   
-    The checklist for custom templates:
+Checklist for custom templates:
 
-    1. Check regexp escaping.
-    2. Check if your json is valid at all.
-    3. If something does not work, please ping me. 
+1. Check regexp escaping.
+2. Check if your json is valid at all.
+3. If something does not work, please ping me. 
 
 ## Markup reference
 
