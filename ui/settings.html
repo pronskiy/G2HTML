@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            margin-left: 10px;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        td {
+            height: 20px;
+        }
+        input {
+            max-width: 50px;
+        }
+    </style>
+</head>
+<body>
+<table id="settings">
+    <tr>
+        <td colspan="2"><label><strong>Generate</strong></label></td>
+    </tr>
+    <tr>
+        <td><label for="paragraphs">Paragraphs</label></td>
+        <td><input id='paragraphs' type='checkbox' name='Force paragraphs'
+                   value='Force paragraphs' <?=options["paragraphs"] ? "checked" : ""?>>
+        </td>
+    </tr>
+    <tr>
+        <td><label for="heading_ids"><strong>id</strong> attributes for headings</label></td>
+        <td><input id='heading_ids' type='checkbox' <?=options["heading_ids"] ? "checked" : ""?>></td>
+    </tr>
+    <tr>
+        <td><label for="generate_images">Images</label></td>
+        <td><input id='generate_images' type='checkbox' <?!=options["generate_images"] ? "checked" : ""?>></td>
+    </tr>
+    <tr>
+        <td><label for="gifs">Gifs</label></td>
+        <td><input id='gifs' type='checkbox' name='Force gifs'
+                   value='Force gifs' <?!=options["generate_images"] ? "" : "disabled"?> <?!=options["gifs"] ? "checked" : ""?>>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><label><strong>Transform</strong></label></td>
+    </tr>
+    <tr>
+        <td><label for="transform_image_width">Always make image_width /= 2</label></td>
+        <td><input id='transform_image_width' type='checkbox' name='Image width'
+                   value='' <?!=options["generate_images"] ? "" : "disabled"?> <?=options["transform_image_width"]  ? "checked" : ""?>
+            >
+        </td>
+    </tr>
+    <tr>
+        <td><label for="max_image_width">Limit max image width to</label></td>
+        <td><input id='max_image_width' type='text' maxlength="4" name='Image width limit'
+                   value='<?!=options["max_image_width"]  ? options["max_image_width"] : "800"?>' <?!=options["generate_images"] ? "" : "disabled"?>
+            >
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><label><strong>Inspections</strong></label></td>
+    </tr>
+    <tr>
+        <td><label for="image_alts">Check image alts</label></td>
+        <td><input id='image_alts' type='checkbox' name='Check links'
+                   value='Check links' <?!=options["generate_images"] ? "" : "disabled"?> <?=options["image_alts"]  ? "checked" : ""?>
+            >
+        </td>
+    </tr>
+    <tr>
+        <td><label for="fetch_links">Check links for 404 (slow)</label></td>
+        <td><input id='fetch_links' type='checkbox' name='Check links'
+                   value='Check links' <?=options["fetch_links"]  ? "checked" : ""?>>
+        </td>
+    </tr>
+    <tr>
+        <td><label for="empty_links">Check empty links</label></td>
+        <td><input id='empty_links' type='checkbox' name='Check empty links'
+                   value='Check empty links' <?=options["empty_links"] ? "checked" : ""?>>
+        </td>
+    </tr>
+</table>
+<table>
+    <tr>
+        <td id="loading">Magic happens... <i class="fa fa-spinner fa-spin"></i>
+            <span class="sr-only">Загрузка...</span>
+        </td>
+        <td>
+            <button id="convert" class="action">Convert
+            </button>
+        </td>
+    </tr>
+</table>
+<script>
+    $("#loading").hide();
+    $('#generate_images').change(function () {
+        // this will contain a reference to the checkbox
+        if (this.checked) {
+            $('#image_alts').removeAttr('disabled');
+            $('#gifs').removeAttr('disabled');
+            $('#transform_image_width').removeAttr('disabled');
+            $('#max_image_width').removeAttr('disabled');
+        } else {
+            $('#image_alts').attr('disabled', 'disabled');
+            $('#gifs').attr('disabled', 'disabled');
+            $('#transform_image_width').attr('disabled', 'disabled');
+            $('#max_image_width').attr('disabled', 'disabled');
+        }
+    });
+    $("#convert").click(function () {
+        $("#loading").show();
+        $("#settings").hide();
+        $("#convert").hide();
+        var settings = <?!=JSON.stringify(options)?>;
+        settings["paragraphs"] = paragraphs.checked;
+        settings["heading_ids"] = heading_ids.checked;
+        settings["gifs"] = gifs.checked;
+        settings["generate_images"] = generate_images.checked;
+        settings["fetch_links"] = fetch_links.checked;
+        settings["empty_links"] = empty_links.checked;
+        settings["image_alts"] = image_alts.checked;
+        settings["transform_image_width"] = transform_image_width.checked;
+        settings["max_image_width"] = max_image_width.value;
+        google.script.run.saveSettings(settings);
+        google.script.run.convert(settings);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.rawgit.com/zenorocha/clipboard.js/v1.7.1/dist/clipboard.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+    <base target="_top">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            margin-left: 10px;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        td {
+            height: 20px;
+        }
+
+        button {
+            min-width: 20px;
+            background-color: white;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #ccc;
+        }
+
+        #buttons {
+            padding: 5px;
+            padding-bottom: 0px;
+            width: 100%;
+            text-align: left;
+        }
+
+        #error_list_wrapper {
+            height: 550px;
+            overflow-y: scroll
+        }
+    </style>
+
+</head>
+<body>
+
+<table id="loading">
+    <tr>
+        <td>Magic happens... <i class="fa fa-spinner fa-spin"></i>
+            <span class="sr-only">Загрузка...</span></td>
+    </tr>
+</table>
+<div id="buttons">
+    <button onclick='$("#loading").show();$("#buttons").hide();$("#error_list").hide();google.script.run.convert(<?!=JSON.stringify(options)?>)'><i class="fas fa-redo-alt"></i></button>
+    <button onclick='google.script.run.showSettings(<?!=JSON.stringify(options)?>)'><i class="fas fa-cog"></i></button>
+    <button id="clipboard" class="action"><i class="far fa-copy"></i></button>
+    <button onclick='window.open("<?=correctUrl?>")' class="action"><i class="fas fa-download"></i></button>
+    <button onclick='window.open("https://yeswolf.github.io/jekyll/update/2018/08/13/plugins.html")'><i class="fas fa-question"></i></button>
+    <hr/>
+</div>
+<div id="error_list_wrapper">
+    <table id="error_list">
+        <tbody>
+        <?for(var index in errors){
+            var error = errors[index];?>
+        <tr style="cursor:pointer;" onmousedown="this.style.background='lightgray';"
+            onmouseup="this.style.background='white';"
+            onclick="google.script.run.setCursor(<?=error["id"]?>);">
+        <?if(error["type"] === "error"){?>
+        <td style="padding-left:5px;width:20px;color:red;"><i class="fa fa-exclamation-circle" area-hidden="true"></i></td>
+        <?}else{?>
+        <td style="padding-left:5px;width:20px;color:orange;"><i class="fa fa-exclamation-triangle" area-hidden="true"></i></td>
+        <?}?>
+        <td><?=error["text"]?></td>
+        </tr>
+        <?}?>
+        </tbody>
+    </table>
+</div>
+<script>
+    var btn = document.getElementById('clipboard');
+    new Clipboard(btn, {
+        text: function(trigger) {
+            return "<?=clipboardContent?>";
+        }
+    });
+    $("#loading").hide()
+</script>
+</body>
+</html>
