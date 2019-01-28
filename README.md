@@ -25,7 +25,8 @@ Only those settings that are can be changed frequently are visible in the UI. Ot
 
 1. **Check image alts**. You can specify image title or description in Google Doc. Plugin checks if one of them is not empty and generate image `alt` attribute.
 2. **Check links for 404** - tries to load the content for each url in the document and shows error if cannot load. 
-3. **Check empty links** - shows errors for empty links
+3. **Check empty links** - shows errors for empty links.
+4. **TBD** - shows warning for every line containing `TBD`.
 
 Errors / warnings are displayed in the list. Each list item is clickable, click scrolls the document to the line / place with error. 
 
