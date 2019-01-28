@@ -88,6 +88,12 @@
                    value='Check empty links' <?=options["empty_links"] ? "checked" : ""?>>
         </td>
     </tr>
+    <tr>
+        <td><label for="tbd">Check TBD</label></td>
+        <td><input id='tbd' type='checkbox' name='Check TBD'
+                value='Check TBD' <?=options["tbd"] ? "checked" : ""?>>
+        </td>
+    </tr>
 </table>
 <table>
     <tr>
@@ -130,6 +136,7 @@
         settings["image_alts"] = image_alts.checked;
         settings["transform_image_width"] = transform_image_width.checked;
         settings["max_image_width"] = max_image_width.value;
+        settings["tbd"] = tbd.value;
         google.script.run.saveSettings(settings);
         google.script.run.convert(settings);
     });

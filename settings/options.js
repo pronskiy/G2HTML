@@ -18,6 +18,7 @@ var DEFAULT_SETTINGS = {
     "fetch_links": false,
     "empty_links": true,
     "image_alts": true,
+    "tbd": true,
     "transform_image_width" : false,
     "max_image_width": "800",
     "idtemplates": [

@@ -213,9 +213,11 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         }
         output.push(partText);
 
+        var position = this.document.newPosition(item, startPos);
         if(partText.match("[ ]{2,}")){
-            var position = this.document.newPosition(item, startPos);
             showMessage(this.document, position, "error", "2 or more spaces");
+        }else if(partText.indexOf("TBD") !== -1){
+            showMessage(this.document, position, "warning", "Something should be done here");
         }
 
         output.push(end);
