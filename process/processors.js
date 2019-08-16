@@ -243,6 +243,27 @@ TYPE_TAG_MAP[DocumentApp.ElementType.LIST_ITEM] = new ListProcessor("");
 TYPE_TAG_MAP[DocumentApp.ElementType.INLINE_IMAGE] = new ImageProcessor("img");
 TYPE_TAG_MAP[DocumentApp.ElementType.TEXT] = new TextProcessor("");
 
+function lookahead(listItem, listId, depth){
+  var currentDepth = 0; 
+  var current = listItem;
+  while (true) {
+      var next = current.getNextSibling();
+      if(next === null){
+         return false;
+      }else if(next.getType() === DocumentApp.ElementType.LIST_ITEM && next.getListId() === listId){
+         return true;
+      }
+    if(next.getType() !== DocumentApp.ElementType.TEXT){
+       currentDepth++;
+      if(currentDepth > depth){
+        break;
+      }
+    }
+    current = next;
+   }
+   return false;
+}
+
 function processItem(doc, item, options) {
     var output = [];
     var prefix = "", suffix = "";
@@ -306,7 +327,8 @@ function convert(settings) {
     var options = settings ? settings : loadSettings();
     var doc = DocumentApp.getActiveDocument();
     var html = processDocument(doc, options);
-    createDocumentForHtml(html, options);
+    var url = createDocumentForHtml(html, options);
+    return renderResults(url, messages, options, html)
 }
 
 function createDocumentForHtml(html, options) {
@@ -324,13 +346,7 @@ function createDocumentForHtml(html, options) {
 
     var newDoc = folder.createFile(name, html);
 
-    var correctUrl = newDoc.getDownloadUrl().replace('&gd=true', '');
-    var template = HtmlService.createTemplateFromFile('ui/results.html');
-    template.correctUrl = correctUrl;
-    template.errors = messages;
-    template.options = options;
-    template.clipboardContent = html;
-    DocumentApp.getUi().showSidebar(template.evaluate().setTitle('Results'))
+    return newDoc.getDownloadUrl().replace('&gd=true', '');
 }
 
 function generateId(item, options) {

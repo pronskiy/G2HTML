@@ -25,7 +25,7 @@ function onInstall(e) {
 
 function onOpen(e) {
     DocumentApp.getUi().createAddonMenu()
-        .addItem('Convert (v.' + VERSION + ')', 'showDefaultSettings')
+        .addItem('Convert', 'showDefaultSettings')
         .addToUi();
     saveSettings(DEFAULT_SETTINGS);
 }
@@ -36,7 +36,29 @@ function showDefaultSettings() {
 }
 
 function showSettings(options) {
-    var template = HtmlService.createTemplateFromFile('ui/settings.html');
+    var settings = renderSettings(options);
+    var main = renderMain("G2HTML v."+VERSION, settings, options);
+    DocumentApp.getUi().showSidebar(main);
+}
+
+function renderSettings(options){
+    var settings = HtmlService.createTemplateFromFile('ui/settings.html');
+    settings.options = options;
+    return settings.evaluate().getContent();
+}
+
+function renderMain(title, content, options){
+    var main = HtmlService.createTemplateFromFile("ui/app.html");
+    main.rendered = content;
+    main.options = options;
+    return main.evaluate().setTitle(title)
+}
+
+function renderResults(url, messages, options, clipboardContent) {
+    var template = HtmlService.createTemplateFromFile('ui/results.html');
+    template.correctUrl = url;
+    template.errors = messages;
     template.options = options;
-    DocumentApp.getUi().showSidebar(template.evaluate().setTitle('Settings'))
+    template.clipboardContent = clipboardContent;
+    return template.evaluate().getContent();
 }

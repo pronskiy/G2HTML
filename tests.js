@@ -1,33 +1,39 @@
 //TODO: have tests in this repository
 function allTests() {
     defaultTransforms();
-    complexDoc();
     badList();
     headings();
     typicalDoc();
     lists();
     nestedLists();
+    complexDoc();
 }
 
-function defaultTransforms(){
+function defaultTransforms() {
     assertEqual(arguments.callee.name);
 }
-function complexDoc(){
+
+function complexDoc() {
     assertEqual(arguments.callee.name);
 }
-function badList(){
+
+function badList() {
     assertEqual(arguments.callee.name);
 }
-function headings(){
+
+function headings() {
     assertEqual(arguments.callee.name);
 }
-function typicalDoc(){
+
+function typicalDoc() {
     assertEqual(arguments.callee.name);
 }
-function lists(){
+
+function lists() {
     assertEqual(arguments.callee.name);
 }
-function nestedLists(){
+
+function nestedLists() {
     assertEqual(arguments.callee.name);
 }
 
@@ -47,7 +53,7 @@ function assertEqual(fileName) {
                 Logger.log(message);
                 throw new Error(message);
             }
-        }else{
+        } else {
             DriveApp.getFoldersByName("G2HTML_TESTS").next().createFile(fileName + "_result.txt", html);
         }
     }

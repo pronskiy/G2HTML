@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+    <script src="https://cdn.rawgit.com/zenorocha/clipboard.js/v1.7.1/dist/clipboard.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            margin-left: 10px;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        td {
+            height: 20px;
+        }
+
+        input {
+            max-width: 50px;
+        }
+
+        button {
+            min-width: 20px;
+            background-color: white;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #ccc;
+        }
+
+        #buttons {
+            padding: 5px;
+            padding-bottom: 0px;
+            width: 100%;
+            text-align: left;
+        }
+
+        #error_list_wrapper {
+            height: 550px;
+            overflow-y: scroll
+        }
+    </style>
+</head>
+<body>
+<table id="loading">
+    <tr>
+        <td>Magic happens... <i class="fa fa-spinner fa-spin"></i>
+            <span class="sr-only">Загрузка...</span></td>
+    </tr>
+</table>
+<div id="main">
+    <?!=rendered?>
+</div>
+</body>
+</html>
