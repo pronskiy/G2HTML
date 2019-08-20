@@ -28,3 +28,17 @@ function makeStartTag(tag, attributes) {
 function makeEndTag(tag, attributes) {
     return makeTag(false, tag, attributes);
 }
+
+var entityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;'
+};
+
+function escapeHtml(string) {
+    return String(string).replace(
+        new RegExp("[&<>\"]", "g"), function (s) {
+        return entityMap[s];
+    });
+}
