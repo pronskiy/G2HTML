@@ -380,6 +380,9 @@ function checkLink(link, options, doc, item, offset) {
         return true;
     } else if (options[OptionKeys.FETCH_LINKS]) {
         try {
+            if(link.indexOf("mailto") !== -1){
+                return false;
+            }
             var response = UrlFetchApp.fetch(link, {"muteHttpExceptions": true});
             if (response.getResponseCode() !== 200) {
                 showMessage(doc, position, "error", "Wrong link, response code: " + response.getResponseCode());
