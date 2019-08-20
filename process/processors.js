@@ -179,6 +179,7 @@ TextProcessor.prototype.start = function (item, attrIndex) {
             }
         }
         output.push(start);
+        partText = escapeHtml(partText);
         if (templates) {
             for (var index in templates) {
                 var tpl = templates[index];

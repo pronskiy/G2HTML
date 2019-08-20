@@ -6,6 +6,7 @@ function allTests() {
     typicalDoc();
     lists();
     nestedLists();
+    htmlEntities();
     complexDoc();
 }
 
@@ -34,6 +35,10 @@ function lists() {
 }
 
 function nestedLists() {
+    assertEqual(arguments.callee.name);
+}
+
+function htmlEntities(){
     assertEqual(arguments.callee.name);
 }
 
