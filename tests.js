@@ -11,38 +11,38 @@ function allTests() {
 }
 
 function defaultTransforms() {
-    assertEqual(arguments.callee.name);
+    doTest(arguments.callee.name);
 }
 
 function complexDoc() {
-    assertEqual(arguments.callee.name);
+    doTest(arguments.callee.name);
 }
 
 function badList() {
-    assertEqual(arguments.callee.name);
+    doTest(arguments.callee.name);
 }
 
 function headings() {
-    assertEqual(arguments.callee.name);
+    doTest(arguments.callee.name);
 }
 
 function typicalDoc() {
-    assertEqual(arguments.callee.name);
+    doTest(arguments.callee.name);
 }
 
 function lists() {
-    assertEqual(arguments.callee.name);
+    doTest(arguments.callee.name);
 }
 
 function nestedLists() {
-    assertEqual(arguments.callee.name);
+    doTest(arguments.callee.name);
 }
 
-function htmlEntities(){
-    assertEqual(arguments.callee.name);
+function htmlEntities() {
+    doTest(arguments.callee.name);
 }
 
-function assertEqual(fileName) {
+function doTest(fileName) {
     var files = DriveApp.getFilesByName(fileName);
     var resultFiles = DriveApp.getFilesByName(fileName + "_result.txt")
     if (files.hasNext()) {
@@ -51,10 +51,14 @@ function assertEqual(fileName) {
         var html = processDocument(doc, DEFAULT_SETTINGS);
         if (resultFiles.hasNext()) {
             var compare = resultFiles.next().getBlob().getDataAsString();
+            var message;
             if (compare === html) {
-                Logger.log(fileName + ": OK");
+                message = fileName + ": OK";
+                console.log(message);
+                Logger.log(message);
             } else {
-                var message = fileName + ": FAIL" + "\n" + "Expected: " + compare + "\n" + "Actual: " + html;
+                message = fileName + ": FAIL" + "\n" + "Expected: " + compare + "\n" + "Actual: " + html;
+                console.log(message);
                 Logger.log(message);
                 throw new Error(message);
             }
