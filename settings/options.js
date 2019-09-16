@@ -8,6 +8,9 @@ var OptionKeys = {
     IMAGE_ALTS: "image_alts",
     TRANSFORM_IMAGE_WIDTH: "transform_image_width",
     MAX_IMAGE_WIDTH:"max_image_width",
+    SHORTCUTS:"shortcuts",
+    TBD:"tbd",
+    SPACES:"spaces"
 };
 
 var DEFAULT_SETTINGS = {
@@ -19,6 +22,8 @@ var DEFAULT_SETTINGS = {
     "empty_links": true,
     "image_alts": true,
     "tbd": true,
+    "shortcuts":true,
+    "spaces":true,
     "transform_image_width" : false,
     "max_image_width": "800",
     "idtemplates": [

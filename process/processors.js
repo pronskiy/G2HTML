@@ -180,6 +180,19 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         }
         output.push(start);
         partText = escapeHtml(partText);
+        var match;
+
+        if (this.options[OptionKeys.SHORTCUTS]) {
+            var shortcuts = new RegExp(SHORTCUTS, "g");
+
+            while ((match = shortcuts.exec(partText)) && attrs[DocumentApp.Attribute.FONT_FAMILY] !== "Consolas") {
+                var idx = startPos + match.index;
+                var position = this.document.newPosition(item, idx);
+                showMessage(this.document, position, "warning", "Shortcut without markup");
+            }
+        }
+
+
         if (templates) {
             for (var index in templates) {
                 var tpl = templates[index];
@@ -214,11 +227,21 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         }
         output.push(partText);
 
-        var position = this.document.newPosition(item, startPos);
-        if(partText.match("[ ]{2,}")){
-            showMessage(this.document, position, "error", "2 or more spaces");
-        }else if(partText.indexOf("TBD") !== -1){
-            showMessage(this.document, position, "warning", "Something should be done here");
+        if (this.options[OptionKeys.SPACES]) {
+            var patt = new RegExp("[ ]{2,}", "g");
+            while (match = patt.exec(partText)) {
+                var idx = startPos + match.index;
+                var position = this.document.newPosition(item, idx);
+                showMessage(this.document, position, "error", "2 or more spaces");
+            }
+        }
+
+        if (this.options[OptionKeys.TBD]) {
+            if (partText.indexOf("TBD") !== -1) {
+                var idx = startPos;
+                var position = this.document.newPosition(item, idx);
+                showMessage(this.document, position, "warning", "Something should be done here");
+            }
         }
 
         output.push(end);

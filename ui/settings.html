@@ -4,9 +4,7 @@
     </tr>
     <tr>
         <td><label for="paragraphs">Paragraphs</label></td>
-        <td><input id='paragraphs' type='checkbox' name='Force paragraphs'
-                   value='Force paragraphs' <?=options["paragraphs"] ? "checked" : ""?>>
-        </td>
+        <td><input id='paragraphs' type='checkbox' <?=options["paragraphs"] ? "checked" : ""?>></td>
     </tr>
     <tr>
         <td><label for="heading_ids"><strong>id</strong> attributes for headings</label></td>
@@ -18,9 +16,7 @@
     </tr>
     <tr>
         <td><label for="gifs">Gifs</label></td>
-        <td><input id='gifs' type='checkbox' name='Force gifs'
-                   value='Force gifs' <?!=options["generate_images"] ? "" : "disabled"?> <?!=options["gifs"] ? "checked" : ""?>>
-        </td>
+        <td><input id='gifs' type='checkbox' <?!=options["generate_images"] ? "" : "disabled"?> <?!=options["gifs"] ? "checked" : ""?>></td>
     </tr>
     <tr>
         <td colspan="2"><label><strong>Transform</strong></label></td>
@@ -43,35 +39,34 @@
         <td colspan="2"><label><strong>Inspections</strong></label></td>
     </tr>
     <tr>
-        <td><label for="image_alts">Check image alts</label></td>
-        <td><input id='image_alts' type='checkbox' name='Check links'
-                   value='Check links' <?!=options["generate_images"] ? "" : "disabled"?> <?=options["image_alts"]  ? "checked" : ""?>
-            >
+        <td><label for="image_alts">Image alts</label></td>
+        <td><input id='image_alts' type='checkbox' <?!=options["generate_images"] ? "" : "disabled"?> <?=options["image_alts"]  ? "checked" : ""?>></td>
+    </tr>
+    <tr>
+        <td><label for="fetch_links">404 errors (slow)</label></td>
+        <td><input id='fetch_links' type='checkbox' <?=options["fetch_links"]  ? "checked" : ""?>>
         </td>
     </tr>
     <tr>
-        <td><label for="fetch_links">Check links for 404 (slow)</label></td>
-        <td><input id='fetch_links' type='checkbox' name='Check links'
-                   value='Check links' <?=options["fetch_links"]  ? "checked" : ""?>>
+        <td><label for="empty_links">Empty links</label></td>
+        <td><input id='empty_links' type='checkbox' <?=options["empty_links"] ? "checked" : ""?>></td>
+    </tr>
+    <tr>
+        <td><label for="tbd">TODOs</label></td>
+        <td><input id='tbd' type='checkbox' <?=options["tbd"] ? "checked" : ""?>></td>
+    </tr>
+    <tr>
+        <td><label for="shortcuts">Shortcuts</label></td>
+        <td><input id='shortcuts' type='checkbox' name='Check TBD'
+                value='Check shortcuts' <?=options["shortcuts"] ? "checked" : ""?>>
         </td>
     </tr>
     <tr>
-        <td><label for="empty_links">Check empty links</label></td>
-        <td><input id='empty_links' type='checkbox' name='Check empty links'
-                   value='Check empty links' <?=options["empty_links"] ? "checked" : ""?>>
-        </td>
+        <td><label for="spaces">Multiple spaces</label></td>
+        <td><input id='spaces' type='checkbox' <?=options["spaces"] ? "checked" : ""?>></td>
     </tr>
     <tr>
-        <td><label for="tbd">Check TBD</label></td>
-        <td><input id='tbd' type='checkbox' name='Check TBD'
-                value='Check TBD' <?=options["tbd"] ? "checked" : ""?>>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <button id="convert" class="action">Convert
-            </button>
-        </td>
+        <td><button id="convert" class="action">Convert</button></td>
     </tr>
 </table>
 <script>
@@ -104,7 +99,9 @@
         settings["image_alts"] = image_alts.checked;
         settings["transform_image_width"] = transform_image_width.checked;
         settings["max_image_width"] = max_image_width.value;
-        settings["tbd"] = tbd.value;
+        settings["tbd"] = tbd.checked;
+        settings["shortcuts"] = shortcuts.checked;
+        settings["spaces"] = spaces.checked;
         google.script.run.saveSettings(settings);
         google.script.run.withSuccessHandler(function (result) {
             $("#main").html(result);
