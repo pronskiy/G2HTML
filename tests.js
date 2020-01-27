@@ -1,45 +1,26 @@
 //TODO: have tests in this repository
+
+var tests = [
+    "defaultTransforms",
+    "badList",
+    "headings",
+    "typicalDoc",
+    "lists",
+    "nestedLists",
+    "htmlEntities",
+    "complexDoc",
+];
+
+function printAllTests(){
+    return tests;
+}
+
 function allTests() {
-    defaultTransforms();
-    badList();
-    headings();
-    typicalDoc();
-    lists();
-    nestedLists();
-    htmlEntities();
-    complexDoc();
-}
-
-function defaultTransforms() {
-    doTest(arguments.callee.name);
-}
-
-function complexDoc() {
-    doTest(arguments.callee.name);
-}
-
-function badList() {
-    doTest(arguments.callee.name);
-}
-
-function headings() {
-    doTest(arguments.callee.name);
-}
-
-function typicalDoc() {
-    doTest(arguments.callee.name);
-}
-
-function lists() {
-    doTest(arguments.callee.name);
-}
-
-function nestedLists() {
-    doTest(arguments.callee.name);
-}
-
-function htmlEntities() {
-    doTest(arguments.callee.name);
+    var result = "";
+    for (var idx in tests) {
+        result += doTest(tests[idx]);
+    }
+    return result;
 }
 
 function doTest(fileName) {
@@ -53,13 +34,11 @@ function doTest(fileName) {
             var compare = resultFiles.next().getBlob().getDataAsString();
             var message;
             if (compare === html) {
-                message = fileName + ": OK";
-                console.log(message);
-                Logger.log(message);
+                message = fileName + ": OK\n";
+                return message;
             } else {
-                message = fileName + ": FAIL" + "\n" + "Expected: " + compare + "\n" + "Actual: " + html;
-                console.log(message);
-                Logger.log(message);
+                message = fileName + ": FAIL" + "\n" + "Expected: " + compare + "\n" + "Actual: " + html+"\n";
+                return message;
                 throw new Error(message);
             }
         } else {
