@@ -9,6 +9,7 @@ var tests = [
     "nestedLists",
     "htmlEntities",
     "complexDoc",
+    "pureHTML"
 ];
 
 function printAllTests(){
@@ -34,10 +35,10 @@ function doTest(fileName) {
             var compare = resultFiles.next().getBlob().getDataAsString();
             var message;
             if (compare === html) {
-                message = fileName + ": OK\n";
+                message = "✅ " + fileName + "\n";
                 return message;
             } else {
-                message = fileName + ": FAIL" + "\n" + "Expected: " + compare + "\n" + "Actual: " + html+"\n";
+                message = "❌ "+fileName + ": FAIL" + "\n" + "Expected: " + compare + "\n" + "Actual: " + html+"\n";
                 return message;
                 throw new Error(message);
             }

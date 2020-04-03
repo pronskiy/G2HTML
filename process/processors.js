@@ -179,7 +179,10 @@ TextProcessor.prototype.start = function (item, attrIndex) {
             }
         }
         output.push(start);
-        partText = escapeHtml(partText);
+        //We escape HTML entities if and only if it's not a [html][/html] tag
+        if(partText.toLowerCase().indexOf("[html]") === -1 && partText.indexOf("[/html]") === -1){
+            partText = escapeHtml(partText);
+        }
         var match;
 
         if (this.options[OptionKeys.SHORTCUTS]) {
@@ -237,7 +240,7 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         }
 
         if (this.options[OptionKeys.TBD]) {
-            if (partText.indexOf("TBD") !== -1) {
+            if (partText.toLowerCase().indexOf("tbd") !== -1) {
                 var idx = startPos;
                 var position = this.document.newPosition(item, idx);
                 showMessage(this.document, position, "warning", "Something should be done here");

@@ -14,6 +14,7 @@ var OptionKeys = {
 };
 
 var DEFAULT_SETTINGS = {
+    "version": VERSION,
     "paragraphs": false,
     "heading_ids": true,
     "gifs": false,
@@ -93,6 +94,10 @@ var DEFAULT_SETTINGS = {
         {
             "regexp": "\\[d\\](.*)\\[\\/d\\]",
             "replacement": "<p><a class=\"jb-download-button\" href=\"some url\"><i class=\"download-icon\"></i>$1</a></p>"
+        },
+        {
+            "regexp":  "\\[html\\](.*)\\[\\/html\\]",
+            "replacement": "$1"
         },
         {
             "regexp": "\\[e\\](.*)\\[\\/e\\]",

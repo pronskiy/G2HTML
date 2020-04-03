@@ -1,2 +1,8 @@
 #!/bin/sh
-clasp run --params "[\"$1\"]" doTest
+
+if [ $# -ge 1 ]; then
+  clasp run --params "[\"$1\"]" doTest
+fi
+if [ $# -lt 1 ]; then
+  clasp run allTests
+fi
