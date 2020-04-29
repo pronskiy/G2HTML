@@ -1,4 +1,4 @@
 var FOLDER_NAME = "G2HTML";
 var SETTINGS_STORAGE_NAME = "g2html_settings.json";
-var VERSION = 49;
+var VERSION = 51;
 var SHORTCUTS = "[⌘⌥⇧⇥⌃↓←→↑⏎]";

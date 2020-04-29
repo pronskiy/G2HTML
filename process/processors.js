@@ -154,6 +154,8 @@ function TextProcessor(tag) {
     Processor.call(this, tag);
 }
 
+var htmlStarted = false;
+
 TextProcessor.prototype = Object.create(Processor.prototype);
 TextProcessor.prototype.start = function (item, attrIndex) {
     var text = item.getText();
@@ -180,8 +182,14 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         }
         output.push(start);
         //We escape HTML entities if and only if it's not a [html][/html] tag
-        if(partText.toLowerCase().indexOf("[html]") === -1 && partText.indexOf("[/html]") === -1){
+        if (partText.toLowerCase().indexOf("[html]") !== -1) {
+            htmlStarted = true;
+        }
+        if (!htmlStarted) {
             partText = escapeHtml(partText);
+        }
+        if (partText.toLowerCase().indexOf("[/html]") !== -1) {
+            htmlStarted = false;
         }
         var match;
 
@@ -270,25 +278,25 @@ TYPE_TAG_MAP[DocumentApp.ElementType.LIST_ITEM] = new ListProcessor("");
 TYPE_TAG_MAP[DocumentApp.ElementType.INLINE_IMAGE] = new ImageProcessor("img");
 TYPE_TAG_MAP[DocumentApp.ElementType.TEXT] = new TextProcessor("");
 
-function lookahead(listItem, listId, depth){
-  var currentDepth = 0; 
-  var current = listItem;
-  while (true) {
-      var next = current.getNextSibling();
-      if(next === null){
-         return false;
-      }else if(next.getType() === DocumentApp.ElementType.LIST_ITEM && next.getListId() === listId){
-         return true;
-      }
-    if(next.getType() !== DocumentApp.ElementType.TEXT){
-       currentDepth++;
-      if(currentDepth > depth){
-        break;
-      }
+function lookahead(listItem, listId, depth) {
+    var currentDepth = 0;
+    var current = listItem;
+    while (true) {
+        var next = current.getNextSibling();
+        if (next === null) {
+            return false;
+        } else if (next.getType() === DocumentApp.ElementType.LIST_ITEM && next.getListId() === listId) {
+            return true;
+        }
+        if (next.getType() !== DocumentApp.ElementType.TEXT) {
+            currentDepth++;
+            if (currentDepth > depth) {
+                break;
+            }
+        }
+        current = next;
     }
-    current = next;
-   }
-   return false;
+    return false;
 }
 
 function processItem(doc, item, options) {

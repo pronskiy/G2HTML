@@ -96,7 +96,11 @@ var DEFAULT_SETTINGS = {
             "replacement": "<p><a class=\"jb-download-button\" href=\"some url\"><i class=\"download-icon\"></i>$1</a></p>"
         },
         {
-            "regexp":  "\\[html\\](.*)\\[\\/html\\]",
+            "regexp":  "\\[html\\](.*)",
+            "replacement": "$1"
+        },
+        {
+            "regexp":  "(.*)\\[\\/html\\]",
             "replacement": "$1"
         },
         {
