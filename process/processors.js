@@ -238,7 +238,7 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         }
         output.push(partText);
 
-        if (this.options[OptionKeys.SPACES]) {
+        if (this.options[OptionKeys.SPACES] && !htmlStarted) {
             var patt = new RegExp("[ ]{2,}", "g");
             while (match = patt.exec(partText)) {
                 var idx = startPos + match.index;
