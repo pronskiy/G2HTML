@@ -44,6 +44,7 @@ function doTest(fileName) {
             }
         } else {
             DriveApp.getFoldersByName("G2HTML_TESTS").next().createFile(fileName + "_result.txt", html);
+            return "🛠 "+fileName+": DRY RUN"
         }
     }
 }

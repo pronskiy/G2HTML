@@ -2,31 +2,98 @@
 
 Google Docs plugin that converts Google Doc to simple HTML that can be used in various blogs.
 
+## Installation
+
+To install this plugin, navigate [here](https://gsuite.google.com/marketplace/app/google_doc_to_html/807648787184)
+
+Plugin versions <= 48 were deployed to the Chrome Web Store, as it was required by Google for Google Docs addons. 
+Newer versions are deployed to the G-Suite Marketplace, as it's required by Google now. 
+Old installations should be automatically updated to newer versions starting from 07.05.2020. 
+
+## Migration
+
+###  Versions <= 52 updated to the latest version:
+a. You do hot have any custom templates in `g2html_settings.json` file:
+   * Close all opened Google Documents
+        * Open Google Drive and search for `g2html_settings.json` file
+        * Delete it
+    b. You have some custom templates in `g2html_settings.json` file:
+        * Close all opened Google Documents
+        * Open Google Drive and search for `g2html_settings.json` file
+        * Download it from the Google Drive
+        * Delete it on Google Drive
+        * Open any Google Document and perform a single conversion.
+        * Add your custom templates to the newly created `g2html_settings.json` file. 
+
+  Without these steps 
+
+## Configuration and folders
+
+This plugin automatically creates the following files and folders:
+
+* `G2HTML` folder to store generated HTMLs (so you can download them as a single file if you don't want to copy HTML contents via "Copy to clipboard" button)
+* `g2html_settings.json` file where all plugin settings are stored and custom replacements can be configured (see the **Customization** section below).
+
+## Markup reference
+
+1. Text with `Consolas` font = `<code>text</code>`
+2. `[d]Title[/d]` = `<p><a class="jb-download-button" href="some url"><i class="download-icon"></i>Title</a></p>`. Change `some url` to your IDE's download url in `g2html_settings.json`.
+3. `[e]http://youtube_link[/e]` = `<iframe width="560" height="315" src="http://youtube_link" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
+4. `[more]` = `<!--more-->`
+5. Select image → ⌘⌥Y → Set Alt or Description for image = `alt` attribute for image. 
+6. Select image → ⌘K → Set link = `src` attribute of the image having this link.
+7. `[html]<html>[/html]` = `<html>` part inserted into rendered HTML without any changes. Great for a custom markup.
+
+Tip: you can define your own tags, see the **Customization** section below.  
+
+## Working with images
+
+The following workflow should be used to deal with images inside the Google Doc to use this plugin efficiently:
+
+1. Upload various images to have final links
+2. Insert them to Google Doc
+3. Set alt and image link using the approach from **Markup reference** section
+4. For GIFs: have the same name and links for the GIF preview and the GIF itself, e.g. upload them at the same time. Set only link to the GIF image itself and turn on `Generate | Gifs` in settings. After that, GIF player markup will be generated automatically. 
+
+## General workflow
+
+1. Write the Google Document
+2. Execute Add-ons → Google Doc to HTML → Convert
+3. Change settings if needed and press "Convert"
+4. Empty warnings / errors list is displayed if everything is OK
+5. List with warnings/errors is displayed if there are some problems. Click the warning or error description to navigate to the place in the document and fix it. Navigation uses bookmarks to jump to the specific place in the document (there is no other way to implement it), and as soon as warning / error is fixed, corresponding bookmark is removed.
+6. As soon as all problems are fixed, copy rendered HTML to clipboard and paste it to the blog post.  
+
+## Toolbar controls (from left to right)
+
+1. Re-run conversion with previously selected settings
+2. Open settings
+3. Copy generated HTML to clipboard
+4. Download generated HTML as HTML file
+5. Help link
+
 ## Settings
 
-All the settings are stored inside the `g2html_settings.json` file. This file is created by the plugin in the root folder of your Google Drive. It's not required to have it here, you can have it in any folder, naming does not matter. 
-Only those settings that are can be changed frequently are visible in the UI. Others (such as replacements) can be changed by editing the settings file (see the **Customization** section below).
+### Generation
 
-### UI settings
-#### Generation
+1. **Paragraphs** - wrap each paragraph in `<p></p>`.
+2. **id attributes for headings** - automatically generate `id` attribute for `h` tags based on the tag content. You can add your own custom regexps for transforming heading content into id in `idtemplates` sections in `g2html_settings.json` file.
+2. **Images** - generate image markup for images in Google Document.
+3. **Gifs** - generate specific markup for GIFs (preview, JB-specific site markup), see **Working with images** section. 
 
-1. **Paragraphs** - wraps each paragraph in `<p></p>`
-2. **id attributes for paragraphs** - automatically generate `id` attribute for `h` tags based on the tag content
-2. **Images** - generate image markup or skip all of them
-3. **Gifs** - generate specific markup for GIFs (preview, JB-specific site markup). Upload `image.png` and `image.gif` at the same time to blog, set only link to gif via ⌘K. 
-
-#### Transform
+### Transform
 
 1. **Always make image width /= 2** - useful when you don't have images with @2x postfix. 
-2. **Limit max image width to** - limits image width to the specified value. 
+2. **Limit max image width to** - limits max image width to the specified value. 
 
+### Inspections
 
-#### Inspections
-
-1. **Check image alts**. You can specify image title or description in Google Doc. Plugin checks if one of them is not empty and generate image `alt` attribute.
-2. **Check links for 404** - tries to load the content for each url in the document and shows error if cannot load. 
-3. **Check empty links** - shows errors for empty links.
-4. **TBD** - shows warning for every line containing `TBD`.
+1. **Image alts** - check if each and every `alt` image attribute is not empty
+2. **404 errors (slow)** - tries to load the content for each url in the document (including images) and reports if there is a problem with loading the content. 
+3. **Empty links** - shows errors for empty links.
+4. **TODOs** - shows warning for every text or link containing `TBD`. Tip: if you don't want to insert the link to some resource right now, enter "TBD" instead of the URL. 
+5. **Shortcuts** - detect shortcuts that do not have "Consolas" font (<code> tags) set. 
+6. **Multiple spaces** - detect several spaces instead of a single one in text. 
 
 Errors / warnings are displayed in the list. Each list item is clickable, click scrolls the document to the line / place with error. 
 
@@ -34,23 +101,35 @@ Errors / warnings are displayed in the list. Each list item is clickable, click 
 
 To customize any settings that are not visible in the plugin UI, download the `g2html_settings.json`, edit it and replace your current settings file with it. After that plugin should use your own settings. 
 
-### All settings
+### Settings reference
 
-1. `paragraphs`. **Value**: `true` or `false`. Stores **Generate paragraphs** option.
-2. `heading_ids`. **Value**: `true` or `false`.Stores **Generate id attributes for paragraphs**.
-3. `gifs`. **Value**: `true` or `false`.Stores **Generate gifs** option.
-4. `generate_images`. **Value**: `true` or `false`. Stores **Generate images** option.
-5. `fetch_links`. **Value**: `true` or `false`. Stores **Check links for 404** option.
-6. `empty_links`. **Value**: `true` or `false`. Stores **Check empty links** option.
-7. `image_alts`. **Value**: `true` or `false`. Stores **Check image alts** option.
-8. `idtemplates`. Array of templates for replacing certain characters for header `id` attribute. Each template has the following format:
+#### Generate
+
+1. `paragraphs`. **Value**: `true` or `false`. Stores **Paragraphs** option.
+2. `heading_ids`. **Value**: `true` or `false`.Stores **id attributes for paragraphs**.
+3. `gifs`. **Value**: `true` or `false`.Stores **Gifs** option.
+4. `generate_images`. **Value**: `true` or `false`. Stores **Images** option.
+
+#### Transform 
+5. `transform_image_width`. **Value**: `true` or `false`. Stores **Always make image_width /= 2** option.
+6. `max_image_width`. **Value**: integer, default is 800. Stores **Limit max image width to** option.
+
+#### Inspections
+7. `image_alts`. **Value**: `true` or `false`. Stores **Image alts** option.
+8. `fetch_links`. **Value**: `true` or `false`. Stores **404 errors (slow)** option.
+9. `empty_links`. **Value**: `true` or `false`. Stores **Empty links** option.
+10. `tbd`. **Value**: `true` or `false`. Stores **TODOs** option.
+11. `shortcuts`. **Value**: `true` or `false`. Stores **Shortcuts** option.
+12. `spaces`. **Value**: `true` or `false`. Stores **Multiple spaces** option.
+
+13. `idtemplates`. Array of templates for replacing certain characters for header `id` attribute. Each template has the following format:
 ```json
 {
      "regexp": "c\\+\\+", //escaped RegExp
      "replacement": "cpp" //text to insert instead of characters matched by regexp
 }
 ``` 
-9. `templates`. Array of templates for text transformations. First accepted template format:
+14. `templates`. Array of templates for text transformations. First accepted template format:
 ```json
 {
     "attributes": {
@@ -90,24 +169,6 @@ Checklist for custom templates:
 1. Check regexp escaping.
 2. Check if your json is valid at all.
 3. If something does not work, please ping me. 
-
-## Markup reference
-
-1. `Consolas` font = `<code>text</code>`
-2. `[d]Title[/d]` = `<p><a class="jb-download-button" href="some url"><i class="download-icon"></i>Title</a></p>`. Change `some url` to your IDE's download url.
-3. `[e]http://youtube_link[/e]` = `<iframe width="560" height="315" src="http://youtube_link" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
-4. `[more]` = `<!--more-->`
-5. ⌘⌥Y→ Set Alt or Description for image = `alt` attribute for having the text specified. 
-6. Select image → ⌘K → Set link = `src` attribute of the image having this link. For gifs: set the link to the .gif image and have the preview .png with the same URL as for .gif image to automatically generate the gif player markup.     
-7. Image having @2x at the end = width / 2 for the `width` attribute.
-
-## Controls (from left to right)
-
-1. Re-run conversion with previously selected settings
-2. Open settings
-3. Copy generated HTML to clipboard
-4. Download generated HTML as HTML file
-5. Help link
 
 ## Limitations
 
