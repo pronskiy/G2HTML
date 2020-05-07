@@ -8,24 +8,24 @@ To install this plugin, navigate [here](https://gsuite.google.com/marketplace/ap
 
 Plugin versions <= 48 were deployed to the Chrome Web Store, as it was required by Google for Google Docs addons. 
 Newer versions are deployed to the G-Suite Marketplace, as it's required by Google now. 
-Old installations should be automatically updated to newer versions starting from 07.05.2020. 
+Old installations should be automatically updated to newer versions starting from **07.05.2020**.
 
 ## Migration
 
 ###  Versions <= 52 updated to the latest version:
-a. You do hot have any custom templates in `g2html_settings.json` file:
-   * Close all opened Google Documents
-        * Open Google Drive and search for `g2html_settings.json` file
-        * Delete it
-    b. You have some custom templates in `g2html_settings.json` file:
-        * Close all opened Google Documents
-        * Open Google Drive and search for `g2html_settings.json` file
-        * Download it from the Google Drive
-        * Delete it on Google Drive
-        * Open any Google Document and perform a single conversion.
-        * Add your custom templates to the newly created `g2html_settings.json` file. 
 
-  Without these steps 
+1. You do hot have any custom templates in `g2html_settings.json` file:
+    * Close all opened Google Documents
+    * Open Google Drive and search for `g2html_settings.json` file
+    * Delete it
+2. You have some custom templates in `g2html_settings.json` file:
+    * Close all opened Google Documents
+    * Open Google Drive and search for `g2html_settings.json` file
+    * Download it from the Google Drive
+    * Delete it on Google Drive
+    * Open any Google Document and perform a single conversion.
+    * Add your custom templates to the newly created `g2html_settings.json` file. 
+Without these steps `[html][/html]` tags added in version 52 won't work. 
 
 ## Configuration and folders
 
@@ -40,9 +40,9 @@ This plugin automatically creates the following files and folders:
 2. `[d]Title[/d]` = `<p><a class="jb-download-button" href="some url"><i class="download-icon"></i>Title</a></p>`. Change `some url` to your IDE's download url in `g2html_settings.json`.
 3. `[e]http://youtube_link[/e]` = `<iframe width="560" height="315" src="http://youtube_link" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
 4. `[more]` = `<!--more-->`
-5. Select image → ⌘⌥Y → Set Alt or Description for image = `alt` attribute for image. 
-6. Select image → ⌘K → Set link = `src` attribute of the image having this link.
-7. `[html]<html>[/html]` = `<html>` part inserted into rendered HTML without any changes. Great for a custom markup.
+5. Select image → ```⌘⌥Y``` → Set ```Alt``` or ```Description``` for image = `alt` attribute for image. 
+6. Select image → ```⌘K``` → Set link = `src` attribute of the image having this link.
+7. `[html]<html part>[/html]` = `<html part>` part inserted into rendered HTML without any changes. Great for a custom markup.
 
 Tip: you can define your own tags, see the **Customization** section below.  
 
@@ -92,10 +92,8 @@ The following workflow should be used to deal with images inside the Google Doc 
 2. **404 errors (slow)** - tries to load the content for each url in the document (including images) and reports if there is a problem with loading the content. 
 3. **Empty links** - shows errors for empty links.
 4. **TODOs** - shows warning for every text or link containing `TBD`. Tip: if you don't want to insert the link to some resource right now, enter "TBD" instead of the URL. 
-5. **Shortcuts** - detect shortcuts that do not have "Consolas" font (<code> tags) set. 
+5. **Shortcuts** - detect shortcuts that do not have "Consolas" font (```<code>``` tags) set.
 6. **Multiple spaces** - detect several spaces instead of a single one in text. 
-
-Errors / warnings are displayed in the list. Each list item is clickable, click scrolls the document to the line / place with error. 
 
 ### Customization
 
@@ -106,13 +104,13 @@ To customize any settings that are not visible in the plugin UI, download the `g
 #### Generate
 
 1. `paragraphs`. **Value**: `true` or `false`. Stores **Paragraphs** option.
-2. `heading_ids`. **Value**: `true` or `false`.Stores **id attributes for paragraphs**.
-3. `gifs`. **Value**: `true` or `false`.Stores **Gifs** option.
+2. `heading_ids`. **Value**: `true` or `false`. Stores **id attributes for paragraphs**.
+3. `gifs`. **Value**: `true` or `false`. Stores **Gifs** option.
 4. `generate_images`. **Value**: `true` or `false`. Stores **Images** option.
 
 #### Transform 
 5. `transform_image_width`. **Value**: `true` or `false`. Stores **Always make image_width /= 2** option.
-6. `max_image_width`. **Value**: integer, default is 800. Stores **Limit max image width to** option.
+6. `max_image_width`. **Value**: integer, 800 by default. Stores **Limit max image width to** option.
 
 #### Inspections
 7. `image_alts`. **Value**: `true` or `false`. Stores **Image alts** option.
@@ -123,48 +121,48 @@ To customize any settings that are not visible in the plugin UI, download the `g
 12. `spaces`. **Value**: `true` or `false`. Stores **Multiple spaces** option.
 
 13. `idtemplates`. Array of templates for replacing certain characters for header `id` attribute. Each template has the following format:
-```json
-{
-     "regexp": "c\\+\\+", //escaped RegExp
-     "replacement": "cpp" //text to insert instead of characters matched by regexp
-}
-``` 
+    ```json
+    {
+        "regexp": "c\\+\\+", //escaped RegExp
+        "replacement": "cpp" //text to insert instead of characters matched by regexp
+    }
+    ``` 
 14. `templates`. Array of templates for text transformations. First accepted template format:
-```json
-{
-    "attributes": {
-        "LINK_URL": true
-    },
-    "replacement": "<a href=\"LINK_URL\">$TEXT$</a>"
-}
-```
-   Each text element in the Google Docs a) contains a text b) has some markup attributes (background color, foreground color, font family etc).
+    ```json
+    {
+        "attributes": {
+            "LINK_URL": true
+        },
+        "replacement": "<a href=\"LINK_URL\">$TEXT$</a>"
+    }
+    ```
+    Each text element in the Google Docs a) contains a text b) has some markup attributes (background color, foreground color, font family etc).
    `attributes` map contains key-value pairs. The key is one of the text [attribute names](https://developers.google.com/apps-script/reference/document/attribute). Value is the value of this attribute. `<attribute>:null` pair means that there should be no such attribute for the text.
    `replacement` is the replacement markup to be inserted into the HTML. The `$TEXT$` variable contains the text of the text element. You can use various text attributes in the markup. To do that, just insert the text attribute name. 
     
-   In the example above, we match all the text elements having non-empty link (`LINK_URL` attribute). In the resulting HTML, each of such elements is wrapped in `<a>` tag with a link from the `LINK_URL` attribute. 
+    In the example above, we match all the text elements having non-empty link (`LINK_URL` attribute). In the resulting HTML, each of such elements is wrapped in `<a>` tag with a link from the `LINK_URL` attribute. 
 
-   Second accepted template format:
-```json
-{
-    "regexp": "\\[d\\](.*)\\[\\/d\\]",
-    "replacement": "<p><a class=\"jb-download-button\" href=\"some url\"><i class=\"download-icon\"></i>$1</a></p>"
-}
-```
+    Second accepted template format:
+    ```json
+    {
+        "regexp": "\\[d\\](.*)\\[\\/d\\]",
+        "replacement": "<p><a class=\"jb-download-button\" href=\"some url\"><i class=\"download-icon\"></i>$1</a></p>"
+    }
+    ```
     
-   `regexp` is a regular expression that matches the text of the text element. Nothing else, no attributes are accepted here. 
-   You can define matcher groups and use them inside the `replacement` attribute. Example below shows how we can use the following custom text in our Google Document:
+    `regexp` is a regular expression that matches the text of the text element. Nothing else, no attributes are accepted here. 
+    You can define matcher groups and use them inside the `replacement` attribute. Example below shows how we can use the following custom text in our Google Document:
     
-   `[d]Download My IDE![/d]`
+    `[d]Download My IDE![/d]`
     
-   This text is transformed into the following HTML markup:
-```html
-    <p><a class="jb-download-button" href="some url"><i class="download-icon"></i>Download My IDE!</a></p>
-```
+    This text is transformed into the following HTML markup:
+    ```html
+        <p><a class="jb-download-button" href="some url"><i class="download-icon"></i>Download My IDE!</a></p>
+    ```
     
-**Suggestion**: as some typical text elements (like links) are handled by the general parser logic, it's not recommended to alter them via templates for now. There is no easy way to simplify the example above - the only way to have the correct template for you is to configure it once for your product. 
+    **Suggestion**: as some typical text elements (like links) are handled by the general parser logic, it's not recommended to alter them via templates for now. There is no easy way to simplify the example above - the only way to have the correct template for you is to configure it once for your product. 
   
-Checklist for custom templates:
+#### Checklist for custom templates:
 
 1. Check regexp escaping.
 2. Check if your json is valid at all.
