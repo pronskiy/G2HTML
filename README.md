@@ -25,6 +25,7 @@ Old installations should be automatically updated to newer versions starting fro
     * Delete it on Google Drive
     * Open any Google Document and perform a single conversion.
     * Add your custom templates to the newly created `g2html_settings.json` file. 
+    
 Without these steps `[html][/html]` tags added in version 52 won't work. 
 
 ## Configuration and folders
