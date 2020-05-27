@@ -54,9 +54,8 @@ function renderMain(title, content, options){
     return main.evaluate().setTitle(title)
 }
 
-function renderResults(url, messages, options, clipboardContent) {
+function renderResults(messages, options, clipboardContent) {
     var template = HtmlService.createTemplateFromFile('ui/results.html');
-    template.correctUrl = url;
     template.errors = messages;
     template.options = options;
     template.clipboardContent = clipboardContent;

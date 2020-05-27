@@ -362,26 +362,7 @@ function convert(settings) {
     var options = settings ? settings : loadSettings();
     var doc = DocumentApp.getActiveDocument();
     var html = processDocument(doc, options);
-    var url = createDocumentForHtml(html, options);
-    return renderResults(url, messages, options, html)
-}
-
-function createDocumentForHtml(html, options) {
-    var name = DocumentApp.getActiveDocument().getName() + ".html";
-    var folder;
-
-    var folders = DriveApp.getFoldersByName(FOLDER_NAME);
-
-    if (folders.hasNext()) {
-        folder = folders.next();
-        folder.setTrashed(true)
-    }
-
-    folder = DriveApp.createFolder(FOLDER_NAME);
-
-    var newDoc = folder.createFile(name, html);
-
-    return newDoc.getDownloadUrl().replace('&gd=true', '');
+    return renderResults(messages, options, html)
 }
 
 function generateId(item, options) {
