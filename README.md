@@ -70,8 +70,7 @@ The following workflow should be used to deal with images inside the Google Doc 
 1. Re-run conversion with previously selected settings
 2. Open settings
 3. Copy generated HTML to clipboard
-4. Download generated HTML as HTML file
-5. Help link
+4. Help link
 
 ## Settings
 
