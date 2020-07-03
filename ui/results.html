@@ -7,24 +7,31 @@
 </div>
 <div id="error_list_wrapper">
     <table id="error_list">
-        <tbody>
         <?for(var index in errors){
             var error = errors[index];?>
-        <tr style="cursor:pointer;" onmousedown="this.style.background='lightgray';"
-            onmouseup="this.style.background='white';"
-            onclick="google.script.run.setCursor(<?=error["id"]?>);">
+        <tr style="cursor:pointer;"
+            onclick="highlight(<?=index?>);google.script.run.setCursor(<?=error["id"]?>);">
+        <td><?=index?>.</td>
         <?if(error["type"] === "error"){?>
-        <td style="padding-left:5px;width:20px;color:red;"><i class="fa fa-exclamation-circle" area-hidden="true"></i></td>
+        <td style="width:20px;color:red;"><i class="fa fa-exclamation-circle" area-hidden="true"></i></td>
         <?}else{?>
-        <td style="padding-left:5px;width:20px;color:orange;"><i class="fa fa-exclamation-triangle" area-hidden="true"></i></td>
+        <td style="width:20px;color:orange;"><i class="fa fa-exclamation-triangle" area-hidden="true"></i></td>
         <?}?>
         <td><?=error["text"]?></td>
         </tr>
         <?}?>
-        </tbody>
     </table>
 </div>
 <script>
+    function highlight(index) {
+        $("#error_list > tbody").children().each(function(i) {
+            if (i === parseInt(index)){
+                $(this).css('background-color', 'lightgray');
+            } else {
+                $(this).css('background-color', 'white');
+            }
+        });
+    }
     var btn = document.getElementById('clipboard');
     new Clipboard(btn, {
         text: function(trigger) {
