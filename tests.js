@@ -40,11 +40,10 @@ function doTest(fileName) {
             } else {
                 message = "❌ "+fileName + ": FAIL" + "\n" + "Expected: " + compare + "\n" + "Actual: " + html+"\n";
                 return message;
-                throw new Error(message);
             }
         } else {
             DriveApp.getFoldersByName("G2HTML_TESTS").next().createFile(fileName + "_result.txt", html);
-            return "🛠 "+fileName+": DRY RUN"
+            return "🛠 "+fileName+": DRY RUN\r\n"
         }
     }
 }

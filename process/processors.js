@@ -57,13 +57,13 @@ ListProcessor.prototype.start = function (item, attrIndex) {
     var listTagName = ordered ? "ol" : "ul";
     var prefix = "";
     if (previous === null || previous.getType() !== DocumentApp.ElementType.LIST_ITEM) {
-        prefix = "<"+listTagName+"><li>";
+        prefix = "<"+listTagName+">\r\n<li>\r\n";
     } else if (previous.getNestingLevel() < item.getNestingLevel()) {
         for (var level = 0; level < item.getNestingLevel() - previous.getNestingLevel(); level++) {
-            prefix += "<"+listTagName+"><li>";
+            prefix += "<"+listTagName+">\r\n<li>\r\n";
         }
     } else {
-        prefix = "<li>"
+        prefix = "<li>\r\n"
     }
     return prefix;
 };
@@ -74,17 +74,17 @@ ListProcessor.prototype.end = function (item) {
     var suffix = "";
     if (next === null || next.getType() !== DocumentApp.ElementType.LIST_ITEM) {
         for (var level = 0; level < item.getNestingLevel() + 1; level++) {
-            suffix += "</li></"+listTagName+">";
+            suffix += "\r\n</li>\r\n</"+listTagName+">";
         }
     } else if (next.getNestingLevel() < item.getNestingLevel()) {
         for (var level = 0; level < item.getNestingLevel() - next.getNestingLevel(); level++) {
-            suffix += "</li></"+listTagName+">";
+            suffix += "\r\n</li>\r\n</"+listTagName+">";
         }
-        suffix += "</li>";
+        suffix += "\r\n</li>";
     } else if (next.getNestingLevel() > item.getNestingLevel()) {
         suffix = "";
     } else {
-        suffix = "</li>";
+        suffix = "\r\n</li>";
     }
     return suffix;
 };
