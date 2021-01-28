@@ -48,6 +48,11 @@
         </td>
     </tr>
     <tr>
+        <td><label for="url_tokens">Marketing tokens in links (UTMs, etc)</label></td>
+        <td><input id='url_tokens' type='checkbox' <?=options["url_tokens"]  ? "checked" : ""?>>
+        </td>
+    </tr>
+    <tr>
         <td><label for="empty_links">Empty links</label></td>
         <td><input id='empty_links' type='checkbox' <?=options["empty_links"] ? "checked" : ""?>></td>
     </tr>
@@ -95,6 +100,7 @@
         settings["gifs"] = gifs.checked;
         settings["generate_images"] = generate_images.checked;
         settings["fetch_links"] = fetch_links.checked;
+        settings["url_tokens"] = url_tokens.checked;
         settings["empty_links"] = empty_links.checked;
         settings["image_alts"] = image_alts.checked;
         settings["transform_image_width"] = transform_image_width.checked;

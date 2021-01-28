@@ -393,19 +393,27 @@ function checkLink(link, options, doc, item, offset) {
     if ((link === null || link === "") && options[OptionKeys.EMPTY_LINKS]) {
         showMessage(doc, position, "error", "Link missed");
         return true;
-    } else if (options[OptionKeys.FETCH_LINKS]) {
-        try {
-            if(link.indexOf("mailto") !== -1){
-                return false;
-            }
-            var response = UrlFetchApp.fetch(link, {"muteHttpExceptions": true});
-            if (response.getResponseCode() !== 200) {
-                showMessage(doc, position, "error", "Wrong link, response code: " + response.getResponseCode());
+    } else {
+        if (options[OptionKeys.FETCH_LINKS]) {
+            try {
+                if (link.indexOf("mailto") !== -1) {
+                    return false;
+                }
+                var response = UrlFetchApp.fetch(link, {"muteHttpExceptions": true});
+                if (response.getResponseCode() !== 200) {
+                    showMessage(doc, position, "error", "Wrong link, response code: " + response.getResponseCode());
+                    return true;
+                }
+            } catch (e) {
+                showMessage(doc, position, "error", "Wrong link, error: " + e.message);
                 return true;
             }
-        } catch (e) {
-            showMessage(doc, position, "error", "Wrong link, error: " + e.message);
-            return true;
+        }
+        if (options[OptionKeys.URL_TOKENS]) {
+            var regexp = new RegExp(URL_TOKENS, "g");
+            if (regexp.exec(link)) {
+                showMessage(doc, position, "warning", "Marketing token in link");
+            }
         }
     }
     return false;
