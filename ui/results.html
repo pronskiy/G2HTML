@@ -1,7 +1,8 @@
 <div id="buttons">
     <button id="convertFromResults"><i class="fas fa-redo-alt"></i></button>
-    <button id="settings"><i class="fas fa-cog"></i></button>
     <button id="clipboard" class="action"><i class="far fa-copy"></i></button>
+    <button id="erase"><i class="fas fa-eraser"></i></button>
+    <button id="settings"><i class="fas fa-cog"></i></button>
     <button onclick='window.open("https://github.com/yeswolf/G2HTML")'><i class="fas fa-question"></i></button>
     <hr/>
 </div>
@@ -39,6 +40,11 @@
         }
     });
     $("#loading").hide();
+    $("#erase").click(function () {
+        google.script.run.withSuccessHandler(function (result) {
+            $("#error_list").hide();
+        }).clearBookmarks();
+    });
     $("#convertFromResults").click(function () {
         $("#loading").show();
         $("#buttons").hide();
