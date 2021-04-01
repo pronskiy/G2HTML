@@ -1,4 +1,3 @@
-
 function Processor(tag) {
     this.tag = tag;
     this.options = null;
@@ -339,6 +338,8 @@ function processItem(doc, item, options) {
 }
 
 function processDocument(doc, options) {
+    checkTitle(doc, options);
+
     var body = doc.getBody();
     var numChildren = body.getNumChildren();
     total = calculateTotal(body);
@@ -366,7 +367,6 @@ function convert(settings) {
 }
 
 function generateId(item, options) {
-
     var id = item.getText();
     if (id === null) {
         return;
@@ -386,6 +386,32 @@ function showMessage(doc, position, type, message) {
         "id": bookmark.getId(),
         "text": message
     });
+}
+
+function checkTitle(doc, options) {
+    var title = doc.getName();
+    console.log("Title: " + title);
+    var zeroPosition = doc.newPosition(doc.getBody(), 0);
+    var match;
+    if (options[OptionKeys.SPACES]) {
+        var patt = new RegExp("[ ]{2,}", "g");
+        while (match = patt.exec(title)) {
+            showMessage(doc, zeroPosition, "error", "2 or more spaces in title");
+        }
+    }
+    if (options[OptionKeys.TITLE_CASE]) {
+        if (title !== title.toTitleCase()) {
+            var properTitle = title.toTitleCase();
+            var properTitleTokens = properTitle.split(" ");
+            var titleTokens = title.split(" ");
+            for (var i = 0; i < titleTokens.length; i++) {
+                if (titleTokens[i] !== properTitleTokens[i]) {
+                    showMessage(doc, zeroPosition, "error", "Title: \"" + titleTokens[i] + "\" should be: \"" + properTitleTokens[i] + "\"");
+                }
+            }
+            showMessage(doc, zeroPosition, "error", "Title should be: " + properTitle);
+        }
+    }
 }
 
 function checkLink(link, options, doc, item, offset) {

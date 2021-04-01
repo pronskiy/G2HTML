@@ -71,6 +71,10 @@
         <td><input id='spaces' type='checkbox' <?=options["spaces"] ? "checked" : ""?>></td>
     </tr>
     <tr>
+        <td><label for="title_case">Title Case</label></td>
+        <td><input id='title_case' type='checkbox' <?=options["title_case"] ? "checked" : ""?>></td>
+    </tr>
+    <tr>
         <td colspan="2"><label><strong>Behavior</strong></label></td>
     </tr>
     <tr>
@@ -117,6 +121,7 @@
         settings["shortcuts"] = shortcuts.checked;
         settings["spaces"] = spaces.checked;
         settings["open_settings_on_start"] = open_settings_on_start.checked;
+        settings["title_case"] = title_case.checked;
         google.script.run.saveSettings(settings);
         google.script.run.withSuccessHandler(function (result) {
             $("#main").html(result);

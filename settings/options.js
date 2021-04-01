@@ -12,7 +12,8 @@ var OptionKeys = {
     SHORTCUTS:"shortcuts",
     TBD:"tbd",
     SPACES:"spaces",
-    OPEN_SETTINGS_ON_START:"open_settings_on_start"
+    OPEN_SETTINGS_ON_START:"open_settings_on_start",
+    TITLE_CASE:"title_case",
 };
 
 var DEFAULT_SETTINGS = {
@@ -116,6 +117,7 @@ var DEFAULT_SETTINGS = {
         }
     ],
     "open_settings_on_start":false,
+    "title_case":true,
 };
 
 function saveSettings(options) {
