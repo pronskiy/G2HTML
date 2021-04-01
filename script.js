@@ -32,12 +32,17 @@ function onOpen(e) {
 
 function showDefaultSettings() {
     var settings = loadSettings();
-    showSettings(settings);
+    if (settings[OptionKeys.OPEN_SETTINGS_ON_START]){
+        showSettings(settings);
+    }else{
+        var loading = renderMain("G2HTML v."+VERSION, "", settings, true);
+        DocumentApp.getUi().showSidebar(loading);
+    }
 }
 
 function showSettings(options) {
     var settings = renderSettings(options);
-    var main = renderMain("G2HTML v."+VERSION, settings, options);
+    var main = renderMain("G2HTML v."+VERSION, settings, options, false);
     DocumentApp.getUi().showSidebar(main);
 }
 
@@ -47,10 +52,11 @@ function renderSettings(options){
     return settings.evaluate().getContent();
 }
 
-function renderMain(title, content, options){
+function renderMain(title, content, options, loading){
     var main = HtmlService.createTemplateFromFile("ui/app.html");
     main.rendered = content;
     main.options = options;
+    main.loading = loading;
     return main.evaluate().setTitle(title)
 }
 

@@ -62,4 +62,14 @@
     <?!=rendered?>
 </div>
 </body>
+<script>
+if(<?!=loading?>){
+    $("#loading").show();
+    var settings = <?!=JSON.stringify(options)?>;
+    google.script.run.withSuccessHandler(function (result) {
+            $("#main").html(result);
+            $("#loading").hide();
+    }).convert(settings);
+}
+</script>
 </html>

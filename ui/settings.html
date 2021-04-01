@@ -71,6 +71,14 @@
         <td><input id='spaces' type='checkbox' <?=options["spaces"] ? "checked" : ""?>></td>
     </tr>
     <tr>
+        <td colspan="2"><label><strong>Behavior</strong></label></td>
+    </tr>
+    <tr>
+        <td><label for="open_settings_on_start">Always open settings before conversion</label></td>
+        <td><input id='open_settings_on_start' type='checkbox' <?=options["open_settings_on_start"]  ? "checked" : ""?>>
+        </td>
+    </tr>
+    <tr>
         <td><button id="convert" class="action">Convert</button></td>
     </tr>
 </table>
@@ -108,6 +116,7 @@
         settings["tbd"] = tbd.checked;
         settings["shortcuts"] = shortcuts.checked;
         settings["spaces"] = spaces.checked;
+        settings["open_settings_on_start"] = open_settings_on_start.checked;
         google.script.run.saveSettings(settings);
         google.script.run.withSuccessHandler(function (result) {
             $("#main").html(result);

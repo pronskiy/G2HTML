@@ -11,7 +11,8 @@ var OptionKeys = {
     MAX_IMAGE_WIDTH:"max_image_width",
     SHORTCUTS:"shortcuts",
     TBD:"tbd",
-    SPACES:"spaces"
+    SPACES:"spaces",
+    OPEN_SETTINGS_ON_START:"open_settings_on_start"
 };
 
 var DEFAULT_SETTINGS = {
@@ -113,7 +114,8 @@ var DEFAULT_SETTINGS = {
             "regexp": "\\[more\\]",
             "replacement": "<!--more-->"
         }
-    ]
+    ],
+    "open_settings_on_start":false,
 };
 
 function saveSettings(options) {
