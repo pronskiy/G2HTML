@@ -9,7 +9,8 @@ var tests = [
     "nestedLists",
     "htmlEntities",
     "complexDoc",
-    "pureHTML"
+    "pureHTML",
+    "shortcuts"
 ];
 
 function printAllTests(){
@@ -43,7 +44,7 @@ function doTest(fileName) {
             }
         } else {
             DriveApp.getFoldersByName("G2HTML_TESTS").next().createFile(fileName + "_result.txt", html);
-            return "🛠 "+fileName+": DRY RUN\r\n"
+            return "🛠"+fileName+": DRY RUN\r\n"
         }
     }
 }
