@@ -1,0 +1,1 @@
+clasp logs --json | jq -r '(if .severity=="ERROR" then "🚫 " else "ℹ️ " end) + " " + .jsonPayload.message'
