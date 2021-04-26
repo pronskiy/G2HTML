@@ -1,1 +1,1 @@
-clasp logs --json | jq -r '(if .severity=="ERROR" then "🚫 " else "ℹ️ " end) + " " + .jsonPayload.message'
+clasp logs --json --watch | jq -r '(if .severity=="ERROR" then "🚫 " else "✍️️ " end) + .timestamp + " " + " " + .jsonPayload.message'
