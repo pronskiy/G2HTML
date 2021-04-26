@@ -1,14 +1,11 @@
 {
   "timeZone": "Europe/Moscow",
-  "dependencies": {},
+  "dependencies": {
+  },
   "exceptionLogging": "STACKDRIVER",
+  "oauthScopes": ["https://www.googleapis.com/auth/documents", "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/script.container.ui", "https://www.googleapis.com/auth/script.external_request"],
   "executionApi": {
     "access": "ANYONE"
   },
-  "oauthScopes": [
-    "https://www.googleapis.com/auth/documents",
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/script.container.ui",
-    "https://www.googleapis.com/auth/script.external_request"
-  ]
+  "runtimeVersion": "V8"
 }
