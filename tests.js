@@ -48,3 +48,16 @@ function doTest(fileName) {
         }
     }
 }
+
+function defaultTest(){
+    var files = DriveApp.getFilesByName("Custom Styles - test");
+    if (files.hasNext()) {
+        var id = files.next().getId();
+        var doc = DocumentApp.openById(id);
+        var settings = loadSettings();
+        var html = processDocument(doc, settings);
+        return "Default run finished";
+    } else {
+        return "Default test not found!";
+    }
+}
