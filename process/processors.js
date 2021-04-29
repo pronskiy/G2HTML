@@ -24,11 +24,11 @@ HeaderProcessor.prototype.attributes = function (item, attrIndex) {
     return (!this.options[OptionKeys.HEADING_IDS] || id === null) ? null : {"id": id};
 };
 HeaderProcessor.prototype.start = function (item, attrIndex) {
-    var numChildren = item.getNumChildren();
+    var numChildren = item["children"].length;
     return (numChildren > 0) ? makeStartTag(this.tag, this.attributes(item)) : "";
 };
 HeaderProcessor.prototype.end = function (item) {
-    var numChildren = item.getNumChildren();
+    var numChildren = item["children"].length;
     return (numChildren > 0) ? makeEndTag(this.tag) : "";
 };
 
@@ -38,11 +38,11 @@ function ParagraphProcessor(tag) {
 
 ParagraphProcessor.prototype = Object.create(Processor.prototype);
 ParagraphProcessor.prototype.start = function (item, attrIndex) {
-    var numChildren = item.getNumChildren();
+    var numChildren = item["children"].length;
     return (numChildren > 0 && this.options[OptionKeys.PARAGRAPHS]) ? makeStartTag(this.tag, this.attributes(item)) : "";
 };
 ParagraphProcessor.prototype.end = function (item) {
-    var numChildren = item.getNumChildren();
+    var numChildren = item["children"].length;
     return (numChildren > 0 && this.options[OptionKeys.PARAGRAPHS]) ? makeEndTag(this.tag) : "";
 };
 
@@ -158,12 +158,14 @@ var htmlStarted = false;
 
 TextProcessor.prototype = Object.create(Processor.prototype);
 TextProcessor.prototype.start = function (item, attrIndex) {
-    var text = item.getText();
-    var indices = item.getTextAttributeIndices();
+    console.log("text item: " + JSON.stringify(item));
+    var text = item["text"];
+    var indices = item["attribute_indices"];
     var templates = this.options.templates;
     var output = [];
     for (var i = 0; i < indices.length; i++) {
-        var attrs = item.getAttributes(indices[i]);
+        var attrs = item["attributes"][i];
+        console.log("attrs: "+JSON.stringify(attrs));
         var startPos = indices[i];
         var endPos = i + 1 < indices.length ? indices[i + 1] : text.length;
         var partText = text.substring(startPos, endPos);
@@ -274,7 +276,8 @@ TYPE_TAG_MAP[DocumentApp.ElementType.PARAGRAPH + "_" + DocumentApp.ParagraphHead
 TYPE_TAG_MAP[DocumentApp.ElementType.TABLE_ROW] = new Processor("tr");
 TYPE_TAG_MAP[DocumentApp.ElementType.TABLE_CELL] = new Processor("td");
 TYPE_TAG_MAP[DocumentApp.ElementType.TABLE] = new Processor("table");
-TYPE_TAG_MAP[DocumentApp.ElementType.LIST_ITEM] = new ListProcessor("");
+TYPE_TAG_MAP[DocumentApp.ElementType.LIST_ITEM] = new Processor("li");
+TYPE_TAG_MAP["LIST"] = new Processor("ul");
 TYPE_TAG_MAP[DocumentApp.ElementType.INLINE_IMAGE] = new ImageProcessor("img");
 TYPE_TAG_MAP[DocumentApp.ElementType.TEXT] = new TextProcessor("");
 
@@ -325,16 +328,20 @@ function rebuildDocument(doc, options) {
 }
 
 var listIndex = {};
-
+var lastListId = null;
 function addToList(list, child) {
     var targetLevel = child["level"];
+    var targetIndent = child["indent"]
 
     var listItems = list["children"];
     var lastListItem = listItems[listItems.length - 1];
     var listLevel = lastListItem["level"];
+    var listIndent = lastListItem["indent"];
     if (listLevel === targetLevel) {
         // console.log("Target level is same, add");
         listItems.push(child);
+    } else if (listIndent === targetIndent) {
+        lastListItem["children"].push(child);
     } else {
         var listItemChilds = lastListItem["children"];
         var lastListChild = null;
@@ -382,6 +389,26 @@ function rebuildItem(doc, item, options) {
         newItem["level"] = item.getNestingLevel();
     }
 
+    if (item.getIndentStart && item.getIndentStart() !== null) {
+        newItem["indent"] = item.getIndentStart();
+    }
+
+    if (item.getHeading && item.getHeading() !== null){
+        newItem["heading"] = item.getHeading();
+    }
+
+    if (item.getTextAttributeIndices && item.getTextAttributeIndices() !== null) {
+        newItem["attribute_indices"] = item.getTextAttributeIndices();
+        var attributes = [];
+        for (var i = 0; i < newItem["attribute_indices"].length; i++) {
+            attributes.push(item.getAttributes(newItem["attribute_indices"][i]))
+        }
+        newItem["attributes"] = attributes;
+    }
+    // if (item.getAttributes && item.getAttributes() !== null) {
+    //     newItem["attributes"] = item.getAttributes();
+    // }
+
     if (item.getNumChildren) {
         var numChildren = item.getNumChildren();
         for (var i = 0; i < numChildren; i++) {
@@ -389,10 +416,11 @@ function rebuildItem(doc, item, options) {
             if (child !== null) {
                 var childItem = rebuildItem(doc, child, options);
                 if (child.getType() === DocumentApp.ElementType.LIST_ITEM) {
-                    let listItems = listIndex[child.getListId()];
+                    let listId = child.getListId();
+                    lastListId = listId;
+                    let listItems = listIndex[listId];
                     if (listItems) {
                         //recursively add
-                        console.log("got list: " + JSON.stringify(listItems));
                         addToList(listItems, childItem);
                     } else {
                         console.log("create new list");
@@ -400,8 +428,16 @@ function rebuildItem(doc, item, options) {
                         newList["type"] = "LIST";
                         newList["children"] = [];
                         newList["children"].push(childItem);
-                        listIndex[child.getListId()] = newList;
-                        childs.push(listIndex[child.getListId()]["children"]);
+                        listIndex[listId] = newList;
+                        childs.push(listIndex[listId]);
+                    }
+                } else if(child.getIndentStart && child.getIndentStart() !== null && child.getIndentStart() !== 0){
+                    if (lastListId) {
+                        console.log("suspicious child: " + JSON.stringify(childItem));
+                        let listItems = listIndex[lastListId];
+                        addToList(listItems, childItem);
+                    }else{
+                        childs.push(childItem);
                     }
                 } else {
                     childs.push(childItem);
@@ -418,7 +454,7 @@ function processItem(doc, item, options) {
     var output = [];
     var prefix = "", suffix = "";
 
-    var key = "" + item.getType();
+    var key = "" + item["type"];
     if (TYPE_TAG_MAP[key]) {
         var processor = TYPE_TAG_MAP[key];
         processor.options = options;
@@ -426,7 +462,7 @@ function processItem(doc, item, options) {
         prefix = processor.start(item);
         suffix = processor.end(item);
     } else {
-        key = item.getType() + (item.getHeading ? "_" + item.getHeading() : "")
+        key = item["type"] + (item["heading"] ? "_" + item["heading"] : "")
 
         if (TYPE_TAG_MAP[key]) {
             var processor = TYPE_TAG_MAP[key];
@@ -438,10 +474,10 @@ function processItem(doc, item, options) {
     }
     output.push(prefix);
 
-    if (item.getNumChildren) {
-        var numChildren = item.getNumChildren();
+    if (item["children"].length > 0) {
+        var numChildren = item["children"].length;
         for (var i = 0; i < numChildren; i++) {
-            var child = item.getChild(i);
+            var child = item["children"][i];
             if (child !== null) {
                 output.push(processItem(doc, child, options));
             }
@@ -455,17 +491,18 @@ function processDocument(doc, options) {
     var output = [];
     checkTitle(doc, options);
     clearBookmarks();
-    var newItem = rebuildItem(doc, doc.getBody(), options);
-    console.log(JSON.stringify(newItem));
-
     var body = doc.getBody();
-    var numChildren = body.getNumChildren();
-    for (var i = 0; i < numChildren; i++) {
-        var child = body.getChild(i);
-        if (child !== null) {
-            output.push(processItem(doc, child, options));
-        }
-    }
+
+    var newItem = rebuildItem(doc, body, options);
+    console.log(JSON.stringify(newItem));
+    output.push(processItem(doc, newItem, options));
+    // var numChildren = body.getNumChildren();
+    // for (var i = 0; i < numChildren; i++) {
+    //     var child = body.getChild(i);
+    //     if (child !== null) {
+    //         output.push(processItem(doc, child, options));
+    //     }
+    // }
 
     var html = output.join('\r');
     if (options[OptionKeys.PARAGRAPHS]) {
@@ -482,7 +519,7 @@ function convert(settings) {
 }
 
 function generateId(item, options) {
-    var id = item.getText();
+    var id = item["text"];
     if (id === null) {
         return;
     }
@@ -530,6 +567,8 @@ function checkTitle(doc, options) {
 }
 
 function checkLink(link, options, doc, item, offset) {
+    //TODO: fix
+    return false;
     var position = doc.newPosition(item, offset);
     if ((link === null || link === "") && options[OptionKeys.EMPTY_LINKS]) {
         showMessage(doc, position, "error", "Link missed");
