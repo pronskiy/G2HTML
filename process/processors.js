@@ -3,6 +3,7 @@ function Processor(tag) {
     this.options = null;
     this.document = null;
 }
+
 Processor.prototype.attributes = function (item, index) {
     return {};
 };
@@ -56,10 +57,10 @@ ListProcessor.prototype.start = function (item, attrIndex) {
     var listTagName = ordered ? "ol" : "ul";
     var prefix = "";
     if (previous === null || previous.getType() !== DocumentApp.ElementType.LIST_ITEM) {
-        prefix = "<"+listTagName+">\r\n<li>\r\n";
+        prefix = "<" + listTagName + ">\r\n<li>\r\n";
     } else if (previous.getNestingLevel() < item.getNestingLevel()) {
         for (var level = 0; level < item.getNestingLevel() - previous.getNestingLevel(); level++) {
-            prefix += "<"+listTagName+">\r\n<li>\r\n";
+            prefix += "<" + listTagName + ">\r\n<li>\r\n";
         }
     } else {
         prefix = "<li>\r\n"
@@ -73,11 +74,11 @@ ListProcessor.prototype.end = function (item) {
     var suffix = "";
     if (next === null || next.getType() !== DocumentApp.ElementType.LIST_ITEM) {
         for (var level = 0; level < item.getNestingLevel() + 1; level++) {
-            suffix += "\r\n</li>\r\n</"+listTagName+">";
+            suffix += "\r\n</li>\r\n</" + listTagName + ">";
         }
     } else if (next.getNestingLevel() < item.getNestingLevel()) {
         for (var level = 0; level < item.getNestingLevel() - next.getNestingLevel(); level++) {
-            suffix += "\r\n</li>\r\n</"+listTagName+">";
+            suffix += "\r\n</li>\r\n</" + listTagName + ">";
         }
         suffix += "\r\n</li>";
     } else if (next.getNestingLevel() > item.getNestingLevel()) {
@@ -119,7 +120,7 @@ ImageProcessor.prototype.attributes = function (item, attrIndex) {
 
         var imageWidth = (link.indexOf("@2x") !== -1 || this.options[OptionKeys.TRANSFORM_IMAGE_WIDTH]) ? res.width / 2 : res.width;
         var maxWidth = this.options[OptionKeys.MAX_IMAGE_WIDTH];
-        if (maxWidth && imageWidth > maxWidth){
+        if (maxWidth && imageWidth > maxWidth) {
             imageWidth = maxWidth;
         }
         var gif = link && link.indexOf(".gif") !== -1;
@@ -218,7 +219,7 @@ TextProcessor.prototype.start = function (item, attrIndex) {
                     var matchAttributes = tpl.attributes;
                     var countMatched = 0;
                     for (var key in tpl.attributes) {
-                        if (matchAttributes[key] === attrs[key] || (matchAttributes[key] === true && attrs[key]) ) {
+                        if (matchAttributes[key] === attrs[key] || (matchAttributes[key] === true && attrs[key])) {
                             countMatched++;
                         }
                     }
@@ -298,19 +299,133 @@ function lookahead(listItem, listId, depth) {
     return false;
 }
 
+function log(item) {
+    var logitem = {};
+    logitem["type"] = item.getType ? item.getType() : "";
+    if (item.getText) {
+        logitem["text"] = item.getText()
+    }
+    // logitem["attributes"] = item.getAttr
+
+
+    console.log(JSON.stringify(logitem))
+}
+
+
+function rebuildDocument(doc, options) {
+    var output = [];
+    var body = doc.getBody();
+    var numChildren = body.getNumChildren();
+    for (var i = 0; i < numChildren; i++) {
+        var child = body.getChild(i);
+        if (child !== null) {
+            output.push(rebuildItem(doc, child, options));
+        }
+    }
+}
+
+var listIndex = {};
+
+function addToList(list, child) {
+    var targetLevel = child["level"];
+
+    var listItems = list["children"];
+    var lastListItem = listItems[listItems.length - 1];
+    var listLevel = lastListItem["level"];
+    if (listLevel === targetLevel) {
+        // console.log("Target level is same, add");
+        listItems.push(child);
+    } else {
+        var listItemChilds = lastListItem["children"];
+        var lastListChild = null;
+        for (var i = 0; i < listItemChilds.length; i++) {
+            let current = listItemChilds[i];
+            if (current["type"] === "LIST") {
+                lastListChild = current;
+            }
+        }
+        // console.log("Child: " + JSON.stringify(child));
+        // console.log("Last list child: " + JSON.stringify(lastListChild));
+        // console.log("Target level " + targetLevel);
+
+        if (lastListChild) {
+            // console.log("Target level is not same, recursive");
+            addToList(lastListChild, child);
+        } else {
+            // console.log("No childs, just add");
+            var newList = {};
+            newList["type"] = "LIST";
+            newList["children"] = [];
+            newList["children"].push(child);
+            listItemChilds.push(newList);
+        }
+    }
+
+
+}
+
+//listIndex[listId][level][lastItem]
+function rebuildItem(doc, item, options) {
+    var childs = [];
+    var newItem = {};
+
+    if (item.getType) {
+        newItem["type"] = item.getType();
+    }
+    if (item.getText && item.getType() !== DocumentApp.ElementType.BODY_SECTION) {
+        newItem["text"] = item.getText();
+    }
+    if (item.getListId) {
+        newItem["listId"] = item.getListId();
+    }
+    if (item.getNestingLevel) {
+        newItem["level"] = item.getNestingLevel();
+    }
+
+    if (item.getNumChildren) {
+        var numChildren = item.getNumChildren();
+        for (var i = 0; i < numChildren; i++) {
+            var child = item.getChild(i);
+            if (child !== null) {
+                var childItem = rebuildItem(doc, child, options);
+                if (child.getType() === DocumentApp.ElementType.LIST_ITEM) {
+                    let listItems = listIndex[child.getListId()];
+                    if (listItems) {
+                        //recursively add
+                        console.log("got list: " + JSON.stringify(listItems));
+                        addToList(listItems, childItem);
+                    } else {
+                        console.log("create new list");
+                        var newList = {};
+                        newList["type"] = "LIST";
+                        newList["children"] = [];
+                        newList["children"].push(childItem);
+                        listIndex[child.getListId()] = newList;
+                        childs.push(listIndex[child.getListId()]["children"]);
+                    }
+                } else {
+                    childs.push(childItem);
+                }
+            }
+        }
+    }
+    newItem["children"] = childs;
+    return newItem;
+}
+
+
 function processItem(doc, item, options) {
     var output = [];
     var prefix = "", suffix = "";
 
-    var key = ""+item.getType();
-
+    var key = "" + item.getType();
     if (TYPE_TAG_MAP[key]) {
         var processor = TYPE_TAG_MAP[key];
         processor.options = options;
         processor.document = doc;
         prefix = processor.start(item);
         suffix = processor.end(item);
-    }else{
+    } else {
         key = item.getType() + (item.getHeading ? "_" + item.getHeading() : "")
 
         if (TYPE_TAG_MAP[key]) {
@@ -326,7 +441,6 @@ function processItem(doc, item, options) {
     if (item.getNumChildren) {
         var numChildren = item.getNumChildren();
         for (var i = 0; i < numChildren; i++) {
-            progress++;
             var child = item.getChild(i);
             if (child !== null) {
                 output.push(processItem(doc, child, options));
@@ -338,20 +452,21 @@ function processItem(doc, item, options) {
 }
 
 function processDocument(doc, options) {
+    var output = [];
     checkTitle(doc, options);
+    clearBookmarks();
+    var newItem = rebuildItem(doc, doc.getBody(), options);
+    console.log(JSON.stringify(newItem));
 
     var body = doc.getBody();
     var numChildren = body.getNumChildren();
-    total = calculateTotal(body);
-    var output = [];
-    clearBookmarks();
     for (var i = 0; i < numChildren; i++) {
         var child = body.getChild(i);
         if (child !== null) {
             output.push(processItem(doc, child, options));
         }
-        progress++;
     }
+
     var html = output.join('\r');
     if (options[OptionKeys.PARAGRAPHS]) {
         html = html.replace(/(?:[\r\n\r\n]+)+/g, "\r\n");
