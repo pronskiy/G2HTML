@@ -25,11 +25,19 @@ HeaderProcessor.prototype.attributes = function (item, attrIndex) {
 };
 HeaderProcessor.prototype.start = function (item, attrIndex) {
     var numChildren = item["children"].length;
-    return (numChildren > 0) ? makeStartTag(this.tag, this.attributes(item)) : "";
+    if (numChildren > 0) {
+        return makeStartTag(this.tag, this.attributes(item))
+    } else {
+        return "";
+    }
 };
 HeaderProcessor.prototype.end = function (item) {
     var numChildren = item["children"].length;
-    return (numChildren > 0) ? makeEndTag(this.tag) : "";
+    if (numChildren > 0) {
+        return makeEndTag(this.tag) + "\r"
+    } else {
+        return "\r";
+    }
 };
 
 function ParagraphProcessor(tag) {
@@ -39,11 +47,27 @@ function ParagraphProcessor(tag) {
 ParagraphProcessor.prototype = Object.create(Processor.prototype);
 ParagraphProcessor.prototype.start = function (item, attrIndex) {
     var numChildren = item["children"].length;
-    return (numChildren > 0 && this.options[OptionKeys.PARAGRAPHS]) ? makeStartTag(this.tag, this.attributes(item)) : "";
+    if (numChildren > 0) {
+        if (this.options[OptionKeys.PARAGRAPHS] && !htmlStarted) {
+            return makeStartTag(this.tag, this.attributes(item))
+        } else {
+            return "";
+        }
+    } else {
+        return "";
+    }
 };
 ParagraphProcessor.prototype.end = function (item) {
     var numChildren = item["children"].length;
-    return (numChildren > 0 && this.options[OptionKeys.PARAGRAPHS]) ? makeEndTag(this.tag) : "";
+    if (numChildren > 0) {
+        if (this.options[OptionKeys.PARAGRAPHS] && !htmlStarted) {
+            return makeEndTag(this.tag) + "\r"
+        } else {
+            return "\r";
+        }
+    } else {
+        return "\r";
+    }
 };
 
 function ListProcessor(tag) {
@@ -52,41 +76,28 @@ function ListProcessor(tag) {
 
 ListProcessor.prototype = Object.create(Processor.prototype);
 ListProcessor.prototype.start = function (item, attrIndex) {
-    var previous = item.getPreviousSibling();
-    var ordered = item.getGlyphType() === DocumentApp.GlyphType.NUMBER;
-    var listTagName = ordered ? "ol" : "ul";
-    var prefix = "";
-    if (previous === null || previous.getType() !== DocumentApp.ElementType.LIST_ITEM) {
-        prefix = "<" + listTagName + ">\r\n<li>\r\n";
-    } else if (previous.getNestingLevel() < item.getNestingLevel()) {
-        for (var level = 0; level < item.getNestingLevel() - previous.getNestingLevel(); level++) {
-            prefix += "<" + listTagName + ">\r\n<li>\r\n";
-        }
-    } else {
-        prefix = "<li>\r\n"
-    }
-    return prefix;
+    var firstItem = item["children"][0];
+    var ordered = firstItem["glyph"] === DocumentApp.GlyphType.NUMBER;
+    var prefix = ordered ? "ol" : "ul";
+    return "<" + prefix + ">\r";
 };
 ListProcessor.prototype.end = function (item) {
-    var next = item.getNextSibling();
-    var ordered = item.getGlyphType() === DocumentApp.GlyphType.NUMBER;
-    var listTagName = ordered ? "ol" : "ul";
-    var suffix = "";
-    if (next === null || next.getType() !== DocumentApp.ElementType.LIST_ITEM) {
-        for (var level = 0; level < item.getNestingLevel() + 1; level++) {
-            suffix += "\r\n</li>\r\n</" + listTagName + ">";
-        }
-    } else if (next.getNestingLevel() < item.getNestingLevel()) {
-        for (var level = 0; level < item.getNestingLevel() - next.getNestingLevel(); level++) {
-            suffix += "\r\n</li>\r\n</" + listTagName + ">";
-        }
-        suffix += "\r\n</li>";
-    } else if (next.getNestingLevel() > item.getNestingLevel()) {
-        suffix = "";
-    } else {
-        suffix = "\r\n</li>";
-    }
-    return suffix;
+    var firstItem = item["children"][0];
+    var ordered = firstItem["glyph"] === DocumentApp.GlyphType.NUMBER;
+    var suffix = ordered ? "ol" : "ul";
+    return "</" + suffix + ">";
+};
+
+function ListItemProcessor(tag) {
+    Processor.call(this, tag);
+}
+
+ListItemProcessor.prototype = Object.create(Processor.prototype);
+ListItemProcessor.prototype.start = function (item, attrIndex) {
+    return "<li>";
+};
+ListItemProcessor.prototype.end = function (item) {
+    return "</li>\r";
 };
 
 function ImageProcessor(tag) {
@@ -96,22 +107,19 @@ function ImageProcessor(tag) {
 ImageProcessor.prototype = Object.create(Processor.prototype);
 ImageProcessor.prototype.attributes = function (item, attrIndex) {
     var attrs = {};
+    let realItem = item["real"];
     try {
-        var blob = item.getBlob();
-        var link = item.getLinkUrl();
-        var title = item.getAltTitle();
-        var desc = item.getAltDescription();
-        var alt = "";
-        if (title) {
-            alt = title;
-        } else if (desc) {
-            alt = desc;
+        var blob = realItem.getBlob();
+        var link = item["href"];
+        var alt = item["alt"];
+        if (!alt) {
+            alt = "";
         }
         if ((alt === "" || alt === null) && this.options[OptionKeys.IMAGE_ALTS]) {
-            var position = this.document.newPosition(item.getParent(), 1);
+            var position = this.document.newPosition(realItem.getParent(), 1);
             showMessage(this.document, position, "warning", "Alt missed");
         }
-        var problematicLink = checkLink(link, this.options, this.document, item.getParent(), 1);
+        var problematicLink = checkLink(link, this.options, this.document, realItem.getParent(), 1);
 
         if (problematicLink) {
             return attrs;
@@ -133,6 +141,7 @@ ImageProcessor.prototype.attributes = function (item, attrIndex) {
             attrs["src"] = link;
         }
     } catch (e) {
+        console.log(`doc title: ${this.document.getName()}`)
         Logger.log(e)
     }
     return attrs;
@@ -158,14 +167,13 @@ var htmlStarted = false;
 
 TextProcessor.prototype = Object.create(Processor.prototype);
 TextProcessor.prototype.start = function (item, attrIndex) {
-    console.log("text item: " + JSON.stringify(item));
+    // console.log("text item: " + JSON.stringify(item));
     var text = item["text"];
     var indices = item["attribute_indices"];
     var templates = this.options.templates;
     var output = [];
     for (var i = 0; i < indices.length; i++) {
         var attrs = item["attributes"][i];
-        console.log("attrs: "+JSON.stringify(attrs));
         var startPos = indices[i];
         var endPos = i + 1 < indices.length ? indices[i + 1] : text.length;
         var partText = text.substring(startPos, endPos);
@@ -178,8 +186,8 @@ TextProcessor.prototype.start = function (item, attrIndex) {
                 start += processor.start(item, indices[i]);
                 end = processor.end(item) + end;
             }
-            if (attrs[DocumentApp.Attribute.LINK_URL] && attrs[DocumentApp.Attribute.LINK_URL] != null && key == DocumentApp.Attribute.LINK_URL) {
-                checkLink(attrs[key], this.options, this.document, item, startPos);
+            if (attrs[DocumentApp.Attribute.LINK_URL] && attrs[DocumentApp.Attribute.LINK_URL] != null && key === DocumentApp.Attribute.LINK_URL) {
+                checkLink(attrs[key], this.options, this.document, item["real"], startPos);
             }
         }
         output.push(start);
@@ -200,7 +208,7 @@ TextProcessor.prototype.start = function (item, attrIndex) {
 
             while ((match = shortcuts.exec(partText)) && attrs[DocumentApp.Attribute.FONT_FAMILY] !== "Consolas") {
                 var idx = startPos + match.index;
-                var position = this.document.newPosition(item, idx);
+                var position = this.document.newPosition(item["real"], idx);
                 showMessage(this.document, position, "warning", "Shortcut without markup");
             }
         }
@@ -244,15 +252,19 @@ TextProcessor.prototype.start = function (item, attrIndex) {
             var patt = new RegExp("[ ]{2,}", "g");
             while (match = patt.exec(partText)) {
                 var idx = startPos + match.index;
-                var position = this.document.newPosition(item, idx);
+                var position = this.document.newPosition(item["real"], idx);
                 showMessage(this.document, position, "error", "2 or more spaces");
             }
+        }
+        if (partText.includes("\t")) {
+            var idx = startPos + partText.indexOf("\t");
+            var position = this.document.newPosition(item["real"], idx);
+            showMessage(this.document, position, "error", "TAB character == broken formatting");
         }
 
         if (this.options[OptionKeys.TBD]) {
             if (partText.toLowerCase().indexOf("tbd") !== -1) {
-                var idx = startPos;
-                var position = this.document.newPosition(item, idx);
+                var position = this.document.newPosition(item["real"], startPos);
                 showMessage(this.document, position, "warning", "Something should be done here");
             }
         }
@@ -273,59 +285,15 @@ TYPE_TAG_MAP[DocumentApp.ElementType.PARAGRAPH + "_" + DocumentApp.ParagraphHead
 TYPE_TAG_MAP[DocumentApp.ElementType.PARAGRAPH + "_" + DocumentApp.ParagraphHeading.HEADING4] = new HeaderProcessor("h4");
 TYPE_TAG_MAP[DocumentApp.ElementType.PARAGRAPH + "_" + DocumentApp.ParagraphHeading.HEADING5] = new HeaderProcessor("h5");
 TYPE_TAG_MAP[DocumentApp.ElementType.PARAGRAPH + "_" + DocumentApp.ParagraphHeading.HEADING6] = new HeaderProcessor("h6");
+TYPE_TAG_MAP[DocumentApp.ElementType.PARAGRAPH + "_" + DocumentApp.ParagraphHeading.SUBTITLE] = new HeaderProcessor("h2");
+TYPE_TAG_MAP[DocumentApp.ElementType.PARAGRAPH + "_" + DocumentApp.ParagraphHeading.TITLE] = new HeaderProcessor("h1");
 TYPE_TAG_MAP[DocumentApp.ElementType.TABLE_ROW] = new Processor("tr");
 TYPE_TAG_MAP[DocumentApp.ElementType.TABLE_CELL] = new Processor("td");
 TYPE_TAG_MAP[DocumentApp.ElementType.TABLE] = new Processor("table");
-TYPE_TAG_MAP[DocumentApp.ElementType.LIST_ITEM] = new Processor("li");
-TYPE_TAG_MAP["LIST"] = new Processor("ul");
+TYPE_TAG_MAP[DocumentApp.ElementType.LIST_ITEM] = new ListItemProcessor("");
+TYPE_TAG_MAP["LIST"] = new ListProcessor("");
 TYPE_TAG_MAP[DocumentApp.ElementType.INLINE_IMAGE] = new ImageProcessor("img");
 TYPE_TAG_MAP[DocumentApp.ElementType.TEXT] = new TextProcessor("");
-
-function lookahead(listItem, listId, depth) {
-    var currentDepth = 0;
-    var current = listItem;
-    while (true) {
-        var next = current.getNextSibling();
-        if (next === null) {
-            return false;
-        } else if (next.getType() === DocumentApp.ElementType.LIST_ITEM && next.getListId() === listId) {
-            return true;
-        }
-        if (next.getType() !== DocumentApp.ElementType.TEXT) {
-            currentDepth++;
-            if (currentDepth > depth) {
-                break;
-            }
-        }
-        current = next;
-    }
-    return false;
-}
-
-function log(item) {
-    var logitem = {};
-    logitem["type"] = item.getType ? item.getType() : "";
-    if (item.getText) {
-        logitem["text"] = item.getText()
-    }
-    // logitem["attributes"] = item.getAttr
-
-
-    console.log(JSON.stringify(logitem))
-}
-
-
-function rebuildDocument(doc, options) {
-    var output = [];
-    var body = doc.getBody();
-    var numChildren = body.getNumChildren();
-    for (var i = 0; i < numChildren; i++) {
-        var child = body.getChild(i);
-        if (child !== null) {
-            output.push(rebuildItem(doc, child, options));
-        }
-    }
-}
 
 var listIndex = {};
 var lastListId = null;
@@ -389,12 +357,30 @@ function rebuildItem(doc, item, options) {
         newItem["level"] = item.getNestingLevel();
     }
 
+    if (item.getGlyphType) {
+        newItem["glyph"] = item.getGlyphType();
+    }
+
     if (item.getIndentStart && item.getIndentStart() !== null) {
         newItem["indent"] = item.getIndentStart();
     }
 
-    if (item.getHeading && item.getHeading() !== null){
+    if (item.getHeading && item.getHeading() !== null) {
         newItem["heading"] = item.getHeading();
+    }
+    if (item.getLinkUrl) {
+        newItem["href"] = item.getLinkUrl();
+    }
+    if (item.getAltTitle) {
+        if (item.getAltTitle()) {
+            newItem["alt"] = item.getAltTitle();
+        } else {
+            if (item.getAltDescription) {
+                if (item.getAltDescription()) {
+                    newItem["alt"] = item.getAltDescription();
+                }
+            }
+        }
     }
 
     if (item.getTextAttributeIndices && item.getTextAttributeIndices() !== null) {
@@ -423,7 +409,7 @@ function rebuildItem(doc, item, options) {
                         //recursively add
                         addToList(listItems, childItem);
                     } else {
-                        console.log("create new list");
+                        // console.log("create new list");
                         var newList = {};
                         newList["type"] = "LIST";
                         newList["children"] = [];
@@ -431,12 +417,12 @@ function rebuildItem(doc, item, options) {
                         listIndex[listId] = newList;
                         childs.push(listIndex[listId]);
                     }
-                } else if(child.getIndentStart && child.getIndentStart() !== null && child.getIndentStart() !== 0){
+                } else if (child.getIndentStart && child.getIndentStart() !== null && child.getIndentStart() !== 0) {
                     if (lastListId) {
-                        console.log("suspicious child: " + JSON.stringify(childItem));
+                        // console.log("suspicious child: " + JSON.stringify(childItem));
                         let listItems = listIndex[lastListId];
                         addToList(listItems, childItem);
-                    }else{
+                    } else {
                         childs.push(childItem);
                     }
                 } else {
@@ -446,6 +432,7 @@ function rebuildItem(doc, item, options) {
         }
     }
     newItem["children"] = childs;
+    newItem["real"] = item;
     return newItem;
 }
 
@@ -488,27 +475,15 @@ function processItem(doc, item, options) {
 }
 
 function processDocument(doc, options) {
-    var output = [];
+    // var output = [];
+
     checkTitle(doc, options);
     clearBookmarks();
     var body = doc.getBody();
 
-    var newItem = rebuildItem(doc, body, options);
-    console.log(JSON.stringify(newItem));
-    output.push(processItem(doc, newItem, options));
-    // var numChildren = body.getNumChildren();
-    // for (var i = 0; i < numChildren; i++) {
-    //     var child = body.getChild(i);
-    //     if (child !== null) {
-    //         output.push(processItem(doc, child, options));
-    //     }
-    // }
-
-    var html = output.join('\r');
-    if (options[OptionKeys.PARAGRAPHS]) {
-        html = html.replace(/(?:[\r\n\r\n]+)+/g, "\r\n");
-    }
-    return html;
+    var newBody = rebuildItem(doc, body, options);
+    console.log(JSON.stringify(newBody));
+    return processItem(doc, newBody, options).trimEnd();
 }
 
 function convert(settings) {
@@ -542,7 +517,6 @@ function showMessage(doc, position, type, message) {
 
 function checkTitle(doc, options) {
     var title = doc.getName();
-    console.log("Title: " + title);
     var zeroPosition = doc.newPosition(doc.getBody(), 0);
     var match;
     if (options[OptionKeys.SPACES]) {
@@ -567,8 +541,6 @@ function checkTitle(doc, options) {
 }
 
 function checkLink(link, options, doc, item, offset) {
-    //TODO: fix
-    return false;
     var position = doc.newPosition(item, offset);
     if ((link === null || link === "") && options[OptionKeys.EMPTY_LINKS]) {
         showMessage(doc, position, "error", "Link missed");
