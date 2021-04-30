@@ -163,8 +163,6 @@ function TextProcessor(tag) {
     Processor.call(this, tag);
 }
 
-var htmlStarted = false;
-
 TextProcessor.prototype = Object.create(Processor.prototype);
 TextProcessor.prototype.start = function (item, attrIndex) {
     // console.log("text item: " + JSON.stringify(item));
@@ -297,6 +295,8 @@ TYPE_TAG_MAP[DocumentApp.ElementType.TEXT] = new TextProcessor("");
 
 var listIndex = {};
 var lastListId = null;
+var htmlStarted = false;
+
 function addToList(list, child) {
     var targetLevel = child["level"];
     var targetIndent = child["indent"]
@@ -339,7 +339,6 @@ function addToList(list, child) {
 
 }
 
-//listIndex[listId][level][lastItem]
 function rebuildItem(doc, item, options) {
     var childs = [];
     var newItem = {};
@@ -356,15 +355,12 @@ function rebuildItem(doc, item, options) {
     if (item.getNestingLevel) {
         newItem["level"] = item.getNestingLevel();
     }
-
     if (item.getGlyphType) {
         newItem["glyph"] = item.getGlyphType();
     }
-
     if (item.getIndentStart && item.getIndentStart() !== null) {
         newItem["indent"] = item.getIndentStart();
     }
-
     if (item.getHeading && item.getHeading() !== null) {
         newItem["heading"] = item.getHeading();
     }
@@ -382,7 +378,6 @@ function rebuildItem(doc, item, options) {
             }
         }
     }
-
     if (item.getTextAttributeIndices && item.getTextAttributeIndices() !== null) {
         newItem["attribute_indices"] = item.getTextAttributeIndices();
         var attributes = [];
@@ -391,10 +386,6 @@ function rebuildItem(doc, item, options) {
         }
         newItem["attributes"] = attributes;
     }
-    // if (item.getAttributes && item.getAttributes() !== null) {
-    //     newItem["attributes"] = item.getAttributes();
-    // }
-
     if (item.getNumChildren) {
         var numChildren = item.getNumChildren();
         for (var i = 0; i < numChildren; i++) {
@@ -436,7 +427,6 @@ function rebuildItem(doc, item, options) {
     return newItem;
 }
 
-
 function processItem(doc, item, options) {
     var output = [];
     var prefix = "", suffix = "";
@@ -475,15 +465,11 @@ function processItem(doc, item, options) {
 }
 
 function processDocument(doc, options) {
-    // var output = [];
-
     checkTitle(doc, options);
     clearBookmarks();
-    var body = doc.getBody();
-
-    var newBody = rebuildItem(doc, body, options);
-    console.log(JSON.stringify(newBody));
-    return processItem(doc, newBody, options).trimEnd();
+    var body = rebuildItem(doc, doc.getBody(), options);
+    console.log(JSON.stringify(body));
+    return processItem(doc, body, options).trimEnd();
 }
 
 function convert(settings) {
