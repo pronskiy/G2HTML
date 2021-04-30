@@ -14,13 +14,27 @@ var tests = [
 ];
 
 function printAllTests(){
-    return tests;
+    return getAllTests();
+}
+
+function getAllTests(){
+    var result = [];
+    let files = DriveApp.getFoldersByName("G2HTML_TESTS").next().getFiles();
+    while (files.hasNext()) {
+        var file = files.next();
+        var name = file.getName();
+        if (!name.includes(".txt")) {
+            result.push(name);
+        }
+    }
+    return result;
 }
 
 function allTests() {
     var result = "";
-    for (var idx in tests) {
-        result += doTest(tests[idx]);
+    let tests = getAllTests();
+    for (var i in tests){
+        result += doTest(tests[i]);
     }
     return result;
 }
@@ -39,7 +53,9 @@ function doTest(fileName) {
                 message = "✅ " + fileName + "\n";
                 return message;
             } else {
-                message = "❌ "+fileName + ": FAIL" + "\n" + "Expected: " + compare + "\n" + "Actual: " + html+"\n";
+                message = "❌ "+fileName +"\n";
+                console.log(`Expected: ${compare.length}`)
+                console.log(`Actual: ${html.length}`)
                 return message;
             }
         } else {
