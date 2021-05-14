@@ -6,3 +6,4 @@ fi
 if [ $# -lt 1 ]; then
   clasp run allTests
 fi
+say "Ready"

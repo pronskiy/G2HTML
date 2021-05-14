@@ -63,4 +63,5 @@
             $("#main").html(result);
         }).renderSettings(<?!=JSON.stringify(options)?>)
     });
+    $("#error_list_wrapper").height(document.documentElement.clientHeight - $("#buttons").height() - 25);
 </script>

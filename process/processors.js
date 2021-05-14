@@ -85,7 +85,7 @@ ListProcessor.prototype.end = function (item) {
     var firstItem = item["children"][0];
     var ordered = firstItem["glyph"] === DocumentApp.GlyphType.NUMBER;
     var suffix = ordered ? "ol" : "ul";
-    return "</" + suffix + ">";
+    return "</" + suffix + ">\r";
 };
 
 function ListItemProcessor(tag) {
@@ -257,7 +257,7 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         if (partText.includes("\t")) {
             var idx = startPos + partText.indexOf("\t");
             var position = this.document.newPosition(item["real"], idx);
-            showMessage(this.document, position, "error", "TAB character == broken formatting");
+            showMessage(this.document, position, "error", "TAB character can break HTML markup. Please, remove it.");
         }
 
         if (this.options[OptionKeys.TBD]) {
@@ -451,7 +451,7 @@ function processItem(doc, item, options) {
     }
     output.push(prefix);
 
-    if (item["children"].length > 0) {
+    if (item["children"] && item["children"].length > 0) {
         var numChildren = item["children"].length;
         for (var i = 0; i < numChildren; i++) {
             var child = item["children"][i];
@@ -465,17 +465,36 @@ function processItem(doc, item, options) {
 }
 
 function processDocument(doc, options) {
-    checkTitle(doc, options);
     clearBookmarks();
-    var body = rebuildItem(doc, doc.getBody(), options);
-    console.log(JSON.stringify(body));
-    return processItem(doc, body, options).trimEnd();
+    var selection = DocumentApp.getActiveDocument().getSelection();
+    if (selection) {
+        var result = "";
+        var elements = selection.getRangeElements();
+        for (var i = 0; i < elements.length; i++) {
+            var range = elements[i];
+            var element = range.getElement();
+            var rebuiltElement = rebuildItem(doc, element, options);
+            result += processItem(doc, rebuiltElement, options).trimEnd();
+        }
+        return {
+            html: result,
+            json: JSON.stringify(rebuiltElement)
+        }
+    } else {
+        checkTitle(doc, options);
+        var body = rebuildItem(doc, doc.getBody(), options);
+        let html = processItem(doc, body, options).trimEnd();
+        return {
+            html: html,
+            json: JSON.stringify(body)
+        }
+    }
 }
 
 function convert(settings) {
     var options = settings ? settings : loadSettings();
     var doc = DocumentApp.getActiveDocument();
-    var html = processDocument(doc, options);
+    var html = processDocument(doc, options).html;
     return renderResults(messages, options, html)
 }
 
