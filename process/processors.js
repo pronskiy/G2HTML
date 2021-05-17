@@ -268,7 +268,7 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         if (partText.includes("\t")) {
             var idx = startPos + partText.indexOf("\t");
             var position = this.document.newPosition(item["real"], idx);
-            showMessage(this.document, position, "error", "TAB character can break HTML markup. Please, remove it.");
+            showMessage(this.document, position, "error", "TAB character can break HTML markup. Please, remove it (⌫⌫⏎ if it's a list).");
         }
 
         if (this.options[OptionKeys.TBD]) {
