@@ -39,7 +39,6 @@ function doTest(fileName) {
         var jsonFiles = DriveApp.getFoldersByName("G2HTML_TESTS").next().getFilesByName(fileName + "_dump.json");
         if (jsonFiles.hasNext()) {
             var jsonFile = jsonFiles.next();
-            console.log(`Trashing file ${jsonFile.getName()}`)
             jsonFile.setTrashed(true);
         }
         DriveApp.getFoldersByName("G2HTML_TESTS").next().createFile(fileName + "_dump.json", result.json);
@@ -52,8 +51,6 @@ function doTest(fileName) {
                 return message;
             } else {
                 message = "❌ "+fileName +"\n";
-                console.log(`Expected: ${compare.length}`)
-                console.log(`Actual: ${html.length}`)
                 return message;
             }
         } else {

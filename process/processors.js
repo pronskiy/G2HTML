@@ -177,7 +177,6 @@ function TextProcessor(tag) {
 
 TextProcessor.prototype = Object.create(Processor.prototype);
 TextProcessor.prototype.start = function (item, attrIndex) {
-    // console.log("text item: " + JSON.stringify(item));
     var text = item["text"];
     var indices = item["attribute_indices"];
     var templates = this.options.templates;
@@ -318,7 +317,6 @@ function addToList(list, child) {
     var listLevel = lastListItem["level"];
     var listIndent = lastListItem["indent"];
     if (listLevel === targetLevel) {
-        // console.log("Target level is same, add");
         listItems.push(child);
     } else if (listIndent === targetIndent) {
         lastListItem["children"].push(child);
@@ -331,15 +329,9 @@ function addToList(list, child) {
                 lastListChild = current;
             }
         }
-        // console.log("Child: " + JSON.stringify(child));
-        // console.log("Last list child: " + JSON.stringify(lastListChild));
-        // console.log("Target level " + targetLevel);
-
         if (lastListChild) {
-            // console.log("Target level is not same, recursive");
             addToList(lastListChild, child);
         } else {
-            // console.log("No childs, just add");
             var newList = {};
             newList["type"] = "LIST";
             newList["children"] = [];
@@ -412,7 +404,6 @@ function rebuildItem(doc, item, options) {
                         //recursively add
                         addToList(listItems, childItem);
                     } else {
-                        // console.log("create new list");
                         var newList = {};
                         newList["type"] = "LIST";
                         newList["children"] = [];
@@ -422,7 +413,6 @@ function rebuildItem(doc, item, options) {
                     }
                 } else if (child.getIndentStart && child.getIndentStart() !== null && child.getIndentStart() !== 0) {
                     if (lastListId) {
-                        // console.log("suspicious child: " + JSON.stringify(childItem));
                         let listItems = listIndex[lastListId];
                         addToList(listItems, childItem);
                     } else {
