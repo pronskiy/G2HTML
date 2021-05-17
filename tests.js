@@ -12,14 +12,16 @@ function getAllTests(){
             result.push(name);
         }
     }
-    return result;
+    return result.sort();
 }
 
 function allTests() {
     var result = "";
     let tests = getAllTests();
-    for (var i in tests){
+    for (var i in tests) {
+        console.time("doTest")
         result += doTest(tests[i]);
+        console.timeEnd("doTest")
     }
     return result;
 }

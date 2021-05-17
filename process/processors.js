@@ -48,6 +48,12 @@ ParagraphProcessor.prototype = Object.create(Processor.prototype);
 ParagraphProcessor.prototype.start = function (item, attrIndex) {
     var numChildren = item["children"].length;
     if (numChildren > 0) {
+        for (var i = 0; i < numChildren; i++) {
+            var child = item["children"][i];
+            if (child !== null && child["text"] && child["text"].includes("[html]")) {
+                htmlStarted = true;
+            }
+        }
         if (this.options[OptionKeys.PARAGRAPHS] && !htmlStarted) {
             return makeStartTag(this.tag, this.attributes(item))
         } else {
@@ -60,6 +66,12 @@ ParagraphProcessor.prototype.start = function (item, attrIndex) {
 ParagraphProcessor.prototype.end = function (item) {
     var numChildren = item["children"].length;
     if (numChildren > 0) {
+        for (var i = 0; i < numChildren; i++) {
+            var child = item["children"][i];
+            if (child !== null && child["text"] && child["text"].includes("[html]")) {
+                htmlStarted = true;
+            }
+        }
         if (this.options[OptionKeys.PARAGRAPHS] && !htmlStarted) {
             return makeEndTag(this.tag) + "\r"
         } else {
