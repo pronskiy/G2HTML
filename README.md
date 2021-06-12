@@ -59,7 +59,7 @@ The following workflow should be used to deal with images inside the Google Doc 
 ## General workflow
 
 1. Write the Google Document
-2. Execute Add-ons → Google Doc to HTML → Convert
+2. Execute Add-ons → Export to HTML → Convert
 3. Change settings if needed and press "Convert"
 4. Empty warnings / errors list is displayed if everything is OK
 5. List with warnings/errors is displayed if there are some problems. Click the warning or error description to navigate to the place in the document and fix it. Navigation uses bookmarks to jump to the specific place in the document (there is no other way to implement it), and as soon as warning / error is fixed, corresponding bookmark is removed.
@@ -68,9 +68,10 @@ The following workflow should be used to deal with images inside the Google Doc 
 ## Toolbar controls (from left to right)
 
 1. Re-run conversion with previously selected settings
-2. Open settings
-3. Copy generated HTML to clipboard
-4. Help link
+2. Copy generated HTML to clipboard
+3. Clear all bookmarks, warnings and errors
+4. Open settings
+5. Help link
 
 ## Settings
 
@@ -89,11 +90,17 @@ The following workflow should be used to deal with images inside the Google Doc 
 ### Inspections
 
 1. **Image alts** - check if each and every `alt` image attribute is not empty
-2. **404 errors (slow)** - tries to load the content for each url in the document (including images) and reports if there is a problem with loading the content. 
-3. **Empty links** - shows errors for empty links.
-4. **TODOs** - shows warning for every text or link containing `TBD`. Tip: if you don't want to insert the link to some resource right now, enter "TBD" instead of the URL. 
-5. **Shortcuts** - detect shortcuts that do not have "Consolas" font (```<code>``` tags) set.
-6. **Multiple spaces** - detect several spaces instead of a single one in text. 
+2. **404 errors (slow)** - tries to load the content for each url in the document (including images) and reports if there is a problem with loading the content.
+3. **Marketing tokens in links (UTMs, etc)** - checks for various marketing tokens in URL and warns you (since you don't need them in original text)
+4. **Empty links** - shows errors for empty links.
+5. **TODOs** - shows warning for every text or link containing `TBD`. Tip: if you don't want to insert the link to some resource right now, enter "TBD" instead of the URL. 
+6. **Shortcuts** - detect shortcuts that do not have "Consolas" font (```<code>``` tags) set.
+7. **Multiple spaces** - detect several spaces instead of a single one in text.
+8. **Title Case** - checks document title for so-called "Title Case" rules and suggests a correct title
+
+### Behavior
+
+1. **Always open settings before conversion** - by default plugin does not show the **Settings** screen when making a document conversion. This option forces it to always show this screen. 
 
 ### Customization
 
@@ -114,20 +121,22 @@ To customize any settings that are not visible in the plugin UI, download the `g
 
 #### Inspections
 7. `image_alts`. **Value**: `true` or `false`. Stores **Image alts** option.
-8. `fetch_links`. **Value**: `true` or `false`. Stores **404 errors (slow)** option.
-9. `empty_links`. **Value**: `true` or `false`. Stores **Empty links** option.
-10. `tbd`. **Value**: `true` or `false`. Stores **TODOs** option.
-11. `shortcuts`. **Value**: `true` or `false`. Stores **Shortcuts** option.
-12. `spaces`. **Value**: `true` or `false`. Stores **Multiple spaces** option.
-
-13. `idtemplates`. Array of templates for replacing certain characters for header `id` attribute. Each template has the following format:
+8. `url_tokens`. **Value**: `true` or `false`. Stores **Marketing tokens in links (UTMs, etc)** option.
+9. `fetch_links`. **Value**: `true` or `false`. Stores **404 errors (slow)** option.
+10. `empty_links`. **Value**: `true` or `false`. Stores **Empty links** option.
+11. `tbd`. **Value**: `true` or `false`. Stores **TODOs** option.
+12. `shortcuts`. **Value**: `true` or `false`. Stores **Shortcuts** option.
+13. `spaces`. **Value**: `true` or `false`. Stores **Multiple spaces** option.
+14. `title_case`. **Value**: `true` or `false`. Stores **Title Case** option. 
+15. `open_settings_on_start`. **Value**: `true` or `false`. Stores the behavior option. 
+16. `idtemplates`. Array of templates for replacing certain characters for header `id` attribute. Each template has the following format:
     ```json
     {
         "regexp": "c\\+\\+", //escaped RegExp
         "replacement": "cpp" //text to insert instead of characters matched by regexp
     }
     ``` 
-14. `templates`. Array of templates for text transformations. First accepted template format:
+17. `templates`. Array of templates for text transformations. First accepted template format:
     ```json
     {
         "attributes": {
