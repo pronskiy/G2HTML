@@ -50,7 +50,7 @@ ParagraphProcessor.prototype.start = function (item, attrIndex) {
     if (numChildren > 0) {
         for (var i = 0; i < numChildren; i++) {
             var child = item["children"][i];
-            if (child !== null && child["text"] && child["text"].includes("[html]")) {
+            if (child !== null && child["text"] && child["text"].indexOf("[html]") !== -1) {
                 htmlStarted = true;
             }
         }
@@ -68,7 +68,7 @@ ParagraphProcessor.prototype.end = function (item) {
     if (numChildren > 0) {
         for (var i = 0; i < numChildren; i++) {
             var child = item["children"][i];
-            if (child !== null && child["text"] && child["text"].includes("[html]")) {
+            if (child !== null && child["text"] && child["text"].indexOf("[html]") !== -1) {
                 htmlStarted = true;
             }
         }
@@ -119,7 +119,7 @@ function ImageProcessor(tag) {
 ImageProcessor.prototype = Object.create(Processor.prototype);
 ImageProcessor.prototype.attributes = function (item, attrIndex) {
     var attrs = {};
-    let realItem = item["real"];
+    var realItem = item["real"];
     try {
         var blob = realItem.getBlob();
         var link = item["href"];
@@ -153,7 +153,6 @@ ImageProcessor.prototype.attributes = function (item, attrIndex) {
             attrs["src"] = link;
         }
     } catch (e) {
-        console.log(`doc title: ${this.document.getName()}`)
         Logger.log(e)
     }
     return attrs;
@@ -265,7 +264,7 @@ TextProcessor.prototype.start = function (item, attrIndex) {
                 showMessage(this.document, position, "error", "2 or more spaces");
             }
         }
-        if (partText.includes("\t")) {
+        if (partText.indexOf("\t") !== -1) {
             var idx = startPos + partText.indexOf("\t");
             var position = this.document.newPosition(item["real"], idx);
             showMessage(this.document, position, "error", "TAB character can break HTML markup. Please, remove it (⌫⌫⏎ if it's a list).");
@@ -324,7 +323,7 @@ function addToList(list, child) {
         var listItemChilds = lastListItem["children"];
         var lastListChild = null;
         for (var i = 0; i < listItemChilds.length; i++) {
-            let current = listItemChilds[i];
+            var current = listItemChilds[i];
             if (current["type"] === "LIST") {
                 lastListChild = current;
             }
@@ -397,9 +396,9 @@ function rebuildItem(doc, item, options) {
             if (child !== null) {
                 var childItem = rebuildItem(doc, child, options);
                 if (child.getType() === DocumentApp.ElementType.LIST_ITEM) {
-                    let listId = child.getListId();
+                    var listId = child.getListId();
                     lastListId = listId;
-                    let listItems = listIndex[listId];
+                    var listItems = listIndex[listId];
                     if (listItems) {
                         //recursively add
                         addToList(listItems, childItem);
@@ -413,7 +412,7 @@ function rebuildItem(doc, item, options) {
                     }
                 } else if (child.getIndentStart && child.getIndentStart() !== null && child.getIndentStart() !== 0) {
                     if (lastListId) {
-                        let listItems = listIndex[lastListId];
+                        var listItems = listIndex[lastListId];
                         addToList(listItems, childItem);
                     } else {
                         childs.push(childItem);
@@ -476,7 +475,7 @@ function processDocument(doc, options) {
             var range = elements[i];
             var element = range.getElement();
             var rebuiltElement = rebuildItem(doc, element, options);
-            result += processItem(doc, rebuiltElement, options).trimEnd();
+            result += processItem(doc, rebuiltElement, options).trim();
         }
         return {
             html: result,
@@ -485,7 +484,7 @@ function processDocument(doc, options) {
     } else {
         checkTitle(doc, options);
         var body = rebuildItem(doc, doc.getBody(), options);
-        let html = processItem(doc, body, options).trimEnd();
+        var html = processItem(doc, body, options).trim();
         return {
             html: html,
             json: JSON.stringify(body)

@@ -4,11 +4,11 @@ function printAllTests(){
 
 function getAllTests(){
     var result = [];
-    let files = DriveApp.getFoldersByName("G2HTML_TESTS").next().getFiles();
+    var files = DriveApp.getFoldersByName("G2HTML_TESTS").next().getFiles();
     while (files.hasNext()) {
         var file = files.next();
         var name = file.getName();
-        if (!name.includes(".txt") && !name.includes(".json")) {
+        if (name.indexOf(".txt") === -1 && name.indexOf(".json") === -1) {
             result.push(name);
         }
     }
@@ -17,7 +17,7 @@ function getAllTests(){
 
 function allTests() {
     var result = "";
-    let tests = getAllTests();
+    var tests = getAllTests();
     for (var i in tests) {
         console.time("doTest")
         result += doTest(tests[i]);
@@ -30,11 +30,10 @@ function doTest(fileName) {
     var files = DriveApp.getFilesByName(fileName);
     var resultFiles = DriveApp.getFilesByName(fileName + "_result.txt")
     if (files.hasNext()) {
-        let file = files.next();
-        console.log(`Processing file: ${file.getName()}`);
+        var file = files.next();
         var id = file.getId();
         var doc = DocumentApp.openById(id);
-        let result = processDocument(doc, loadSettings());
+        var result = processDocument(doc, loadSettings());
         var html = result.html;
         var jsonFiles = DriveApp.getFoldersByName("G2HTML_TESTS").next().getFilesByName(fileName + "_dump.json");
         if (jsonFiles.hasNext()) {

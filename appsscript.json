@@ -12,6 +12,5 @@
   ],
   "executionApi": {
     "access": "ANYONE"
-  },
-  "runtimeVersion": "V8"
+  }
 }
