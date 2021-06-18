@@ -17,14 +17,14 @@ function showDefaultSettings() {
     if (settings[OptionKeys.OPEN_SETTINGS_ON_START]){
         showSettings(settings);
     }else{
-        var loading = renderMain("G2HTML v."+VERSION, "", settings, true);
+        var loading = renderMain(PLUGIN_NAME+" v."+VERSION, "", settings, true);
         DocumentApp.getUi().showSidebar(loading);
     }
 }
 
 function showSettings(options) {
     var settings = renderSettings(options);
-    var main = renderMain("G2HTML v."+VERSION, settings, options, false);
+    var main = renderMain(PLUGIN_NAME+" v."+VERSION, settings, options, false);
     DocumentApp.getUi().showSidebar(main);
 }
 
