@@ -19,9 +19,10 @@ function allTests() {
     var result = "";
     var tests = getAllTests();
     for (var i in tests) {
-        console.time("doTest")
-        result += doTest(tests[i]);
-        console.timeEnd("doTest")
+        var name = tests[i];
+        console.time(name);
+        result += doTest(name);
+        console.timeEnd(name);
     }
     return result;
 }
@@ -47,9 +48,11 @@ function doTest(fileName) {
             var message;
             if (compare === html) {
                 message = "✅ " + fileName + "\n";
+                console.log(message);
                 return message;
             } else {
                 message = "❌ "+fileName +"\n";
+                console.log(message);
                 return message;
             }
         } else {

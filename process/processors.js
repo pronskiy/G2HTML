@@ -389,10 +389,10 @@ function rebuildItem(doc, item, options) {
         }
         newItem["attributes"] = attributes;
     }
-    if (item.getNumChildren) {
-        var numChildren = item.getNumChildren();
+    if (item.getNumChildren || item.getRangeElements) {
+        var numChildren = item.getRangeElements ? item.getRangeElements().length : item.getNumChildren();
         for (var i = 0; i < numChildren; i++) {
-            var child = item.getChild(i);
+            var child = item.getRangeElements ? item.getRangeElements()[i].getElement() : item.getChild(i);
             if (child !== null) {
                 var childItem = rebuildItem(doc, child, options);
                 if (child.getType() === DocumentApp.ElementType.LIST_ITEM) {
@@ -469,17 +469,11 @@ function processDocument(doc, options) {
     clearBookmarks();
     var selection = DocumentApp.getActiveDocument().getSelection();
     if (selection) {
-        var result = "";
-        var elements = selection.getRangeElements();
-        for (var i = 0; i < elements.length; i++) {
-            var range = elements[i];
-            var element = range.getElement();
-            var rebuiltElement = rebuildItem(doc, element, options);
-            result += processItem(doc, rebuiltElement, options).trim();
-        }
+        var body = rebuildItem(doc, selection, options);
+        var html = processItem(doc, body, options).trim();
         return {
-            html: result,
-            json: JSON.stringify(rebuiltElement)
+            html: html,
+            json: JSON.stringify(body)
         }
     } else {
         checkTitle(doc, options);
