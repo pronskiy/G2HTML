@@ -44,6 +44,7 @@ This plugin automatically creates the following files and folders:
 5. Select image → ```⌘⌥Y``` → Set ```Alt``` or ```Description``` for image = `alt` attribute for image. 
 6. Select image → ```⌘K``` → Set link = `src` attribute of the image having this link.
 7. `[html]<html part>[/html]` = `<html part>` part inserted into rendered HTML without any changes. Great for a custom markup.
+8. `[skip]<part to skip>[/skip]` = `<part to skip>` is not in the rendered HTML. 
 
 Tip: you can define your own tags, see the **Customization** section below.  
 

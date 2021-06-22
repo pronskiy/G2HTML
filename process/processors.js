@@ -50,11 +50,16 @@ ParagraphProcessor.prototype.start = function (item, attrIndex) {
     if (numChildren > 0) {
         for (var i = 0; i < numChildren; i++) {
             var child = item["children"][i];
-            if (child !== null && child["text"] && child["text"].indexOf("[html]") !== -1) {
-                htmlStarted = true;
+            if (child !== null && child["text"]) {
+                if (child["text"].indexOf("[html]") !== -1) {
+                    htmlStarted = true;
+                }
+                if (child["text"].indexOf("[skip]") !== -1) {
+                    skipStarted = true;
+                }
             }
         }
-        if (this.options[OptionKeys.PARAGRAPHS] && !htmlStarted) {
+        if (this.options[OptionKeys.PARAGRAPHS] && !htmlStarted && !skipStarted) {
             return makeStartTag(this.tag, this.attributes(item))
         } else {
             return "";
@@ -68,11 +73,16 @@ ParagraphProcessor.prototype.end = function (item) {
     if (numChildren > 0) {
         for (var i = 0; i < numChildren; i++) {
             var child = item["children"][i];
-            if (child !== null && child["text"] && child["text"].indexOf("[html]") !== -1) {
-                htmlStarted = true;
+            if (child !== null && child["text"]) {
+                if (child["text"].indexOf("[html]") !== -1) {
+                    htmlStarted = true;
+                }
+                if (child["text"].indexOf("[skip]") !== -1) {
+                    skipStarted = true;
+                }
             }
         }
-        if (this.options[OptionKeys.PARAGRAPHS] && !htmlStarted) {
+        if (this.options[OptionKeys.PARAGRAPHS] && !htmlStarted && !skipStarted) {
             return makeEndTag(this.tag) + "\r"
         } else {
             return "\r";
@@ -187,7 +197,9 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         var partText = text.substring(startPos, endPos);
         var start = "";
         var end = "";
-
+        if (partText.toLowerCase().indexOf("[skip]") !== -1) {
+            skipStarted = true;
+        }
         for (var key in attrs) {
             var processor = attrs[key] !== null ? TYPE_TAG_MAP[DocumentApp.ElementType.TEXT + "_" + key] : null;
             if (processor) {
@@ -198,7 +210,9 @@ TextProcessor.prototype.start = function (item, attrIndex) {
                 checkLink(attrs[key], this.options, this.document, item["real"], startPos);
             }
         }
-        output.push(start);
+        if (!skipStarted) {
+            output.push(start);
+        }
         //We escape HTML entities if and only if it's not a [html][/html] tag
         if (partText.toLowerCase().indexOf("[html]") !== -1) {
             htmlStarted = true;
@@ -254,7 +268,9 @@ TextProcessor.prototype.start = function (item, attrIndex) {
 
             }
         }
-        output.push(partText);
+        if (!skipStarted) {
+            output.push(partText);
+        }
 
         if (this.options[OptionKeys.SPACES] && !htmlStarted) {
             var patt = new RegExp("[ ]{2,}", "g");
@@ -277,7 +293,12 @@ TextProcessor.prototype.start = function (item, attrIndex) {
             }
         }
 
-        output.push(end);
+        if (!skipStarted) {
+            output.push(end);
+        }
+        if (partText.toLowerCase().indexOf("[/skip]") !== -1) {
+            skipStarted = false;
+        }
     }
     return output.join('');
 };
@@ -306,6 +327,7 @@ TYPE_TAG_MAP[DocumentApp.ElementType.TEXT] = new TextProcessor("");
 var listIndex = {};
 var lastListId = null;
 var htmlStarted = false;
+var skipStarted = false;
 
 function addToList(list, child) {
     var targetLevel = child["level"];
