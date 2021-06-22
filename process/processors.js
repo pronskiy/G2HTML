@@ -8,10 +8,10 @@ Processor.prototype.attributes = function (item, index) {
     return {};
 };
 Processor.prototype.start = function (item, attrIndex) {
-    return makeStartTag(this.tag, this.attributes(item, attrIndex));
+    return !skipStarted ?  makeStartTag(this.tag, this.attributes(item, attrIndex)) : "";
 };
 Processor.prototype.end = function (item) {
-    return makeEndTag(this.tag);
+    return !skipStarted ? makeEndTag(this.tag) : "";
 };
 
 function HeaderProcessor(tag) {
@@ -26,7 +26,7 @@ HeaderProcessor.prototype.attributes = function (item, attrIndex) {
 HeaderProcessor.prototype.start = function (item, attrIndex) {
     var numChildren = item["children"].length;
     if (numChildren > 0) {
-        return makeStartTag(this.tag, this.attributes(item))
+        return !skipStarted ? makeStartTag(this.tag, this.attributes(item)) : "";
     } else {
         return "";
     }
@@ -34,7 +34,7 @@ HeaderProcessor.prototype.start = function (item, attrIndex) {
 HeaderProcessor.prototype.end = function (item) {
     var numChildren = item["children"].length;
     if (numChildren > 0) {
-        return makeEndTag(this.tag) + "\r"
+        return !skipStarted ? (makeEndTag(this.tag) + "\r") : "";
     } else {
         return "\r";
     }
@@ -101,13 +101,13 @@ ListProcessor.prototype.start = function (item, attrIndex) {
     var firstItem = item["children"][0];
     var ordered = firstItem["glyph"] === DocumentApp.GlyphType.NUMBER;
     var prefix = ordered ? "ol" : "ul";
-    return "<" + prefix + ">\r";
+    return !skipStarted ?  "<" + prefix + ">\r" : "";
 };
 ListProcessor.prototype.end = function (item) {
     var firstItem = item["children"][0];
     var ordered = firstItem["glyph"] === DocumentApp.GlyphType.NUMBER;
     var suffix = ordered ? "ol" : "ul";
-    return "</" + suffix + ">\r";
+    return !skipStarted ?  "</" + suffix + ">\r" : "";
 };
 
 function ListItemProcessor(tag) {
@@ -116,10 +116,10 @@ function ListItemProcessor(tag) {
 
 ListItemProcessor.prototype = Object.create(Processor.prototype);
 ListItemProcessor.prototype.start = function (item, attrIndex) {
-    return "<li>";
+    return !skipStarted ?  "<li>" : "";
 };
 ListItemProcessor.prototype.end = function (item) {
-    return "</li>\r";
+    return !skipStarted ? "</li>\r" : "";
 };
 
 function ImageProcessor(tag) {
@@ -168,13 +168,13 @@ ImageProcessor.prototype.attributes = function (item, attrIndex) {
     return attrs;
 };
 ImageProcessor.prototype.start = function (item, attrIndex) {
-    if (!this.options[OptionKeys.GENERATE_IMAGES]) {
+    if (!this.options[OptionKeys.GENERATE_IMAGES] || skipStarted) {
         return "";
     }
     return makeStartSingleTag(this.tag, this.attributes(item));
 };
 ImageProcessor.prototype.end = function (item) {
-    if (!this.options[OptionKeys.GENERATE_IMAGES]) {
+    if (!this.options[OptionKeys.GENERATE_IMAGES] || skipStarted) {
         return "";
     }
     return makeEndSingleTag("");
