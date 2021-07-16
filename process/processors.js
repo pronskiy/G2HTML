@@ -206,7 +206,7 @@ TextProcessor.prototype.start = function (item, attrIndex) {
                 start += processor.start(item, indices[i]);
                 end = processor.end(item) + end;
             }
-            if (attrs[DocumentApp.Attribute.LINK_URL] && attrs[DocumentApp.Attribute.LINK_URL] != null && key === DocumentApp.Attribute.LINK_URL) {
+            if (attrs[DocumentApp.Attribute.LINK_URL] && attrs[DocumentApp.Attribute.LINK_URL] !== null && key === ""+DocumentApp.Attribute.LINK_URL) {
                 checkLink(attrs[key], this.options, this.document, item["real"], startPos);
             }
         }

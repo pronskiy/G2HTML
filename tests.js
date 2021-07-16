@@ -34,7 +34,7 @@ function doTest(fileName) {
         var file = files.next();
         var id = file.getId();
         var doc = DocumentApp.openById(id);
-        var result = processDocument(doc, loadSettings());
+        var result = processDocument(doc, DEFAULT_SETTINGS);
         var html = result.html;
         var jsonFiles = DriveApp.getFoldersByName("G2HTML_TESTS").next().getFilesByName(fileName + "_dump.json");
         if (jsonFiles.hasNext()) {
