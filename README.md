@@ -128,16 +128,17 @@ To customize any settings that are not visible in the plugin UI, download the `g
 11. `tbd`. **Value**: `true` or `false`. Stores **TODOs** option.
 12. `shortcuts`. **Value**: `true` or `false`. Stores **Shortcuts** option.
 13. `spaces`. **Value**: `true` or `false`. Stores **Multiple spaces** option.
-14. `title_case`. **Value**: `true` or `false`. Stores **Title Case** option. 
-15. `open_settings_on_start`. **Value**: `true` or `false`. Stores the behavior option. 
-16. `idtemplates`. Array of templates for replacing certain characters for header `id` attribute. Each template has the following format:
+14. `title_case`. **Value**: `true` or `false`. Stores **Title Case** option.
+15. `title_case_headings`. **Value**: `true` or `false`. Store **Title Case in all headings** option. 
+16. `open_settings_on_start`. **Value**: `true` or `false`. Stores the behavior option. 
+17. `idtemplates`. Array of templates for replacing certain characters for header `id` attribute. Each template has the following format:
     ```json
     {
         "regexp": "c\\+\\+", //escaped RegExp
         "replacement": "cpp" //text to insert instead of characters matched by regexp
     }
     ``` 
-17. `templates`. Array of templates for text transformations. First accepted template format:
+18. `templates`. Array of templates for text transformations. First accepted template format:
     ```json
     {
         "attributes": {
