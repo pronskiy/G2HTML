@@ -53,6 +53,11 @@
         google.script.run.withSuccessHandler(function (result) {
             $("#main").html(result);
             $("#loading").hide();
+        }).withFailureHandler(function (result) {
+            google.script.run.withSuccessHandler(function (result) {
+                $("#main").html(result);
+                $("#loading").hide();
+            }).showFatal(result.toString(), settings, "")
         }).convert(settings);
     });
     $("#settings").click(function () {

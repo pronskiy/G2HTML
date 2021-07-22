@@ -49,3 +49,12 @@ function renderResults(messages, options, clipboardContent) {
     template.clipboardContent = clipboardContent;
     return template.evaluate().getContent();
 }
+function showFatal(message, options){
+    var messages = []
+    messages.push({
+        "type": "error",
+        "id": 0,
+        "text": "Fatal error: "+ message.toString()+" Please, report to Stanislav Dombrovsky."
+    });
+    return renderResults(messages, options, "")
+}

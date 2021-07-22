@@ -20,6 +20,20 @@ function HeaderProcessor(tag) {
 
 HeaderProcessor.prototype = Object.create(Processor.prototype);
 HeaderProcessor.prototype.attributes = function (item, attrIndex) {
+    if (this.options[OptionKeys.TITLE_CASE_HEADINGS]) {
+        var text = item["text"]
+        if (text !== text.toTitleCase()) {
+            var properTitle = text.toTitleCase();
+            var properTitleTokens = properTitle.split(" ");
+            var titleTokens = text.split(" ");
+            for (var i = 0; i < titleTokens.length; i++) {
+                if (titleTokens[i] !== properTitleTokens[i]) {
+                    showMessage(this.document, this.document.newPosition(item["real"], 0), "error", "Title: \"" + titleTokens[i] + "\" should be: \"" + properTitleTokens[i] + "\"");
+                }
+            }
+            showMessage(this.document, this.document.newPosition(item["real"], 0), "error", "Title should be: " + properTitle);
+        }
+    }
     var id = generateId(item, this.options);
     return (!this.options[OptionKeys.HEADING_IDS] || id === null) ? null : {"id": id};
 };
@@ -369,7 +383,7 @@ function rebuildItem(doc, item, options) {
     var newItem = {};
 
     if (item.getType) {
-        newItem["type"] = item.getType();
+        newItem["type"] = item.getType().toString();
     }
     if (item.getText && item.getType() !== DocumentApp.ElementType.BODY_SECTION) {
         newItem["text"] = item.getText();
@@ -387,7 +401,7 @@ function rebuildItem(doc, item, options) {
         newItem["indent"] = item.getIndentStart();
     }
     if (item.getHeading && item.getHeading() !== null) {
-        newItem["heading"] = item.getHeading();
+        newItem["heading"] = item.getHeading().toString();
     }
     if (item.getLinkUrl) {
         newItem["href"] = item.getLinkUrl();
