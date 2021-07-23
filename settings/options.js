@@ -14,7 +14,8 @@ var OptionKeys = {
     SPACES:"spaces",
     OPEN_SETTINGS_ON_START:"open_settings_on_start",
     TITLE_CASE:"title_case",
-    TITLE_CASE_HEADINGS:"title_case_headings"
+    TITLE_CASE_HEADINGS:"title_case_headings",
+    DASHES: "dashes"
 };
 
 var DEFAULT_SETTINGS = {
@@ -119,7 +120,8 @@ var DEFAULT_SETTINGS = {
     ],
     "open_settings_on_start":false,
     "title_case":true,
-    "title_case_headings":true
+    "title_case_headings":true,
+    "dashes":true
 };
 
 function saveSettings(options) {

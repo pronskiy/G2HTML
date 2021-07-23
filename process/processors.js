@@ -294,17 +294,13 @@ TextProcessor.prototype.start = function (item, attrIndex) {
                 showMessage(this.document, position, "error", "2 or more spaces");
             }
         }
-        if (partText.indexOf("\t") !== -1) {
-            var idx = startPos + partText.indexOf("\t");
-            var position = this.document.newPosition(item["real"], idx);
-            showMessage(this.document, position, "error", "TAB character can break HTML markup. Please, remove it (⌫⌫⏎ if it's a list).");
+        checkSimpleToken(this.document, partText, startPos, item, "\t","error", "TAB character can break HTML markup. Please, remove it (⌫⌫⏎ if it's a list).")
+        if (this.options[OptionKeys.DASHES]) {
+            checkSimpleToken(this.document, partText, startPos, item, " -", "warning", "Hyphen (-) instead of em-dash (—)")
+            checkSimpleToken(this.document, partText, startPos, item, " –", "warning", "En-dash (–) instead of em-dash (—)")
         }
-
         if (this.options[OptionKeys.TBD]) {
-            if (partText.toLowerCase().indexOf("tbd") !== -1) {
-                var position = this.document.newPosition(item["real"], startPos);
-                showMessage(this.document, position, "warning", "Something should be done here");
-            }
+            checkSimpleToken(this.document, partText.toLowerCase(), startPos, item, "tbd","warning", "Something should be done here")
         }
 
         if (!skipStarted) {
@@ -540,6 +536,21 @@ function generateId(item, options) {
         id = id.replace(new RegExp(tpl.regexp, "g"), tpl.replacement);
     }
     return id;
+}
+
+function checkSimpleToken(doc, partText, startPos, item, token, type, message) {
+    var fromIndex = 0;
+    while(true){
+        var tokenIndex = partText.indexOf(token, fromIndex);
+        if (tokenIndex !== -1) {
+            fromIndex = tokenIndex+token.length+1;
+            var idx = startPos + tokenIndex;
+            var position = doc.newPosition(item["real"], idx);
+            showMessage(doc, position, type, message);
+        }else{
+            break;
+        }
+    }
 }
 
 function showMessage(doc, position, type, message) {
