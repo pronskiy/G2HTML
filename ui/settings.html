@@ -1,3 +1,4 @@
+<div id="list_wrapper">
 <table id="settings">
     <tr>
         <td colspan="2"><label><strong>Generate</strong></label></td>
@@ -94,10 +95,12 @@
         <td><input id='open_settings_on_start' type='checkbox' <?=options["open_settings_on_start"]  ? "checked" : ""?>>
         </td>
     </tr>
-    <tr>
-        <td><button id="convert" class="action">Convert</button></td>
-    </tr>
 </table>
+</div>
+<div id="buttons">
+    <hr/>
+    <button id="convert" class="action">Convert</button>
+</div>
 <script>
     $("#loading").hide();
     $('#generate_images').change(function () {
@@ -143,4 +146,5 @@
             $("#loading").hide();
         }).convert(settings);
     });
+    $("#list_wrapper").height(document.documentElement.clientHeight - $("#buttons").height() - 10);
 </script>
