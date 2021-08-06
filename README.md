@@ -98,6 +98,9 @@ The following workflow should be used to deal with images inside the Google Doc 
 6. **Shortcuts** - detect shortcuts that do not have "Consolas" font (```<code>``` tags) set.
 7. **Multiple spaces** - detect several spaces instead of a single one in text.
 8. **Title Case** - checks document title for so-called "Title Case" rules and suggests a correct title
+9. **Title Case in all headings** - checks all document headings for so-called "Title Case" rules and suggests a correct title
+10. **Hyphens** - warns about hyphens between sentence parts and suggest the proper symbol. 
+11. **En-dashes** - warns about en-dashes and suggests replacing them with em-dashes (useful for RU). 
 
 ### Behavior
 

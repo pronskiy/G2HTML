@@ -79,7 +79,11 @@
         <td><input id='title_case_headings' type='checkbox' <?=options["title_case_headings"] ? "checked" : ""?>></td>
     </tr>
     <tr>
-        <td><label for="dashes">Dashes</label></td>
+        <td><label for="hyphens">Hyphens</label></td>
+        <td><input id='hyphens' type='checkbox' <?=options["hyphens"] ? "checked" : ""?>></td>
+    </tr>
+    <tr>
+        <td><label for="dashes">En-dashes (select for RU)</label></td>
         <td><input id='dashes' type='checkbox' <?=options["dashes"] ? "checked" : ""?>></td>
     </tr>
     <tr>
@@ -132,6 +136,7 @@
         settings["title_case"] = title_case.checked;
         settings["title_case_headings"] = title_case_headings.checked;
         settings["dashes"] = dashes.checked;
+        settings["hyphens"] = hyphens.checked;
         google.script.run.saveSettings(settings);
         google.script.run.withSuccessHandler(function (result) {
             $("#main").html(result);

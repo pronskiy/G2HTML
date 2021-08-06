@@ -295,10 +295,13 @@ TextProcessor.prototype.start = function (item, attrIndex) {
             }
         }
         checkSimpleToken(this.document, partText, startPos, item, "\t","error", "TAB character can break HTML markup. Please, remove it (⌫⌫⏎ if it's a list).")
-        if (this.options[OptionKeys.DASHES]) {
-            checkSimpleToken(this.document, partText, startPos, item, " -", "warning", "Hyphen (-) instead of em-dash (—)")
-            checkSimpleToken(this.document, partText, startPos, item, " –", "warning", "En-dash (–) instead of em-dash (—)")
+        if (this.options[OptionKeys.HYPHENS]) {
+            checkSimpleToken(this.document, partText, startPos, item, " -", "warning", "Hyphen (-) instead of em-dash (—) (RU) or en-dash (–) (EN)")
         }
+        if (this.options[OptionKeys.DASHES]) {
+            checkSimpleToken(this.document, partText, startPos, item, " –", "warning", "En-dash (–) instead of em-dash (—) (RU only).")
+        }
+
         if (this.options[OptionKeys.TBD]) {
             checkSimpleToken(this.document, partText.toLowerCase(), startPos, item, "tbd","warning", "Something should be done here")
         }
