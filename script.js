@@ -54,7 +54,7 @@ function showFatal(message, options){
     messages.push({
         "type": "error",
         "id": 0,
-        "text": "Fatal error: "+ message.toString()+" Please, report to Stanislav Dombrovsky."
+        "text": "Fatal error: "+ message.toString()+". Please, send this stacktrace + link to this document to Stanislav Dombrovsky"
     });
     return renderResults(messages, options, "")
 }

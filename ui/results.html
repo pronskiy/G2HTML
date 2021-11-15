@@ -53,11 +53,11 @@
         google.script.run.withSuccessHandler(function (result) {
             $("#main").html(result);
             $("#loading").hide();
-        }).withFailureHandler(function (result) {
+        }).withFailureHandler(function (error) {
             google.script.run.withSuccessHandler(function (result) {
                 $("#main").html(result);
                 $("#loading").hide();
-            }).showFatal(result.toString(), settings, "")
+            }).showFatal(error.toString() + " Stacktrace: "+error.stack, settings)
         }).convert(settings);
     });
     $("#settings").click(function () {

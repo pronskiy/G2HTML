@@ -231,24 +231,42 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         if (partText.toLowerCase().indexOf("[html]") !== -1) {
             htmlStarted = true;
         }
-        if (!htmlStarted) {
-            partText = escapeHtml(partText);
-        }
-        if (partText.toLowerCase().indexOf("[/html]") !== -1) {
-            htmlStarted = false;
-        }
-        var match;
 
-        if (this.options[OptionKeys.SHORTCUTS]) {
+        if (this.options[OptionKeys.SHORTCUTS] && !skipStarted) {
             var shortcuts = new RegExp(SHORTCUTS, "g");
-
+            var match;
             while ((match = shortcuts.exec(partText)) && attrs[DocumentApp.Attribute.FONT_FAMILY] !== "Consolas") {
                 var idx = startPos + match.index;
                 var position = this.document.newPosition(item["real"], idx);
                 showMessage(this.document, position, "warning", "Shortcut without markup");
             }
         }
+        if (this.options[OptionKeys.SPACES] && !htmlStarted && !skipStarted) {
+            var patt = new RegExp("[ ]{2,}", "g");
+            while (match = patt.exec(partText)) {
+                var idx = startPos + match.index;
+                var position = this.document.newPosition(item["real"], idx);
+                showMessage(this.document, position, "error", "2 or more spaces");
+            }
+        }
+        checkSimpleToken(this.document, partText, startPos, item, "\t","error", "TAB character can break HTML markup. Please, remove it (⌫⌫⏎ if it's a list).")
+        if (this.options[OptionKeys.HYPHENS]) {
+            checkSimpleToken(this.document, partText, startPos, item, " -", "warning", "Hyphen (-) instead of em-dash (—) (RU) or en-dash (–) (EN)")
+        }
+        if (this.options[OptionKeys.DASHES]) {
+            checkSimpleToken(this.document, partText, startPos, item, " –", "warning", "En-dash (–) instead of em-dash (—) (RU only).")
+        }
 
+        if (this.options[OptionKeys.TBD]) {
+            checkSimpleToken(this.document, partText.toLowerCase(), startPos, item, "tbd","warning", "Something should be done here")
+        }
+
+        if (!htmlStarted) {
+            partText = escapeHtml(partText);
+        }
+        if (partText.toLowerCase().indexOf("[/html]") !== -1) {
+            htmlStarted = false;
+        }
 
         if (templates) {
             for (var index in templates) {
@@ -284,26 +302,6 @@ TextProcessor.prototype.start = function (item, attrIndex) {
         }
         if (!skipStarted) {
             output.push(partText);
-        }
-
-        if (this.options[OptionKeys.SPACES] && !htmlStarted) {
-            var patt = new RegExp("[ ]{2,}", "g");
-            while (match = patt.exec(partText)) {
-                var idx = startPos + match.index;
-                var position = this.document.newPosition(item["real"], idx);
-                showMessage(this.document, position, "error", "2 or more spaces");
-            }
-        }
-        checkSimpleToken(this.document, partText, startPos, item, "\t","error", "TAB character can break HTML markup. Please, remove it (⌫⌫⏎ if it's a list).")
-        if (this.options[OptionKeys.HYPHENS]) {
-            checkSimpleToken(this.document, partText, startPos, item, " -", "warning", "Hyphen (-) instead of em-dash (—) (RU) or en-dash (–) (EN)")
-        }
-        if (this.options[OptionKeys.DASHES]) {
-            checkSimpleToken(this.document, partText, startPos, item, " –", "warning", "En-dash (–) instead of em-dash (—) (RU only).")
-        }
-
-        if (this.options[OptionKeys.TBD]) {
-            checkSimpleToken(this.document, partText.toLowerCase(), startPos, item, "tbd","warning", "Something should be done here")
         }
 
         if (!skipStarted) {
@@ -543,6 +541,9 @@ function generateId(item, options) {
 
 function checkSimpleToken(doc, partText, startPos, item, token, type, message) {
     var fromIndex = 0;
+    if(skipStarted){
+        return
+    }
     while(true){
         var tokenIndex = partText.indexOf(token, fromIndex);
         if (tokenIndex !== -1) {
