@@ -1,7 +1,7 @@
 apt update
-apt install zsh
+apt install -y zsh
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-apt install npm
+apt install -y npm
 npm install -g n
 n stable
 npm install -g @google/clasp
