@@ -5,7 +5,7 @@ ENV LC_ALL=C.UTF-8
 
 RUN apt-get update
 RUN apt update && \
-     apt install -y curl wget && \
+     apt install -y curl wget git && \
      apt install -y zsh && \
      sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
 apt install -y npm && \
