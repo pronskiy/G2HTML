@@ -1,4 +1,12 @@
-# What is it? 
+# Some statistics first
+## Found
+[![](https://img.shields.io/badge/dynamic/json?color=yellow&label=Warnings&query=%24.fields.Warnings&url=https%3A%2F%2Fapi.airtable.com%2Fv0%2FappsLZAPESjpqzA3Z%2FStats%2FrecDeI3lBbnwQJhkG%3Fapi_key%3DkeyUIdeexo613U2Nn&&style=for-the-badge)]() [![](https://img.shields.io/badge/dynamic/json?color=red&label=Errors&query=%24.fields.Errors&url=https%3A%2F%2Fapi.airtable.com%2Fv0%2FappsLZAPESjpqzA3Z%2FStats%2FrecDeI3lBbnwQJhkG%3Fapi_key%3DkeyUIdeexo613U2Nn&&style=for-the-badge)]()
+## Processed
+[![](https://img.shields.io/badge/dynamic/json?color=blue&label=Documents&query=%24.fields.Documents&url=https%3A%2F%2Fapi.airtable.com%2Fv0%2FappsLZAPESjpqzA3Z%2FStats%2FrecDeI3lBbnwQJhkG%3Fapi_key%3DkeyUIdeexo613U2Nn&&style=for-the-badge)]() [![](https://img.shields.io/badge/dynamic/json?color=blue&label=Words&query=%24.fields.Words&url=https%3A%2F%2Fapi.airtable.com%2Fv0%2FappsLZAPESjpqzA3Z%2FStats%2FrecDeI3lBbnwQJhkG%3Fapi_key%3DkeyUIdeexo613U2Nn&&style=for-the-badge)]() [![](https://img.shields.io/badge/dynamic/json?color=blue&label=Characters&query=%24.fields.Chars&url=https%3A%2F%2Fapi.airtable.com%2Fv0%2FappsLZAPESjpqzA3Z%2FStats%2FrecDeI3lBbnwQJhkG%3Fapi_key%3DkeyUIdeexo613U2Nn&&style=for-the-badge)]()
+
+## Saved
+[![](https://img.shields.io/badge/dynamic/json?color=blue&label=Hours&query=%24.fields.Hours&url=https%3A%2F%2Fapi.airtable.com%2Fv0%2FappsLZAPESjpqzA3Z%2FStats%2FrecDeI3lBbnwQJhkG%3Fapi_key%3DkeyUIdeexo613U2Nn&&style=for-the-badge)]() [![](https://img.shields.io/badge/dynamic/json?color=blue&label=Days&query=%24.fields.Days&url=https%3A%2F%2Fapi.airtable.com%2Fv0%2FappsLZAPESjpqzA3Z%2FStats%2FrecDeI3lBbnwQJhkG%3Fapi_key%3DkeyUIdeexo613U2Nn&&style=for-the-badge)]() [![](https://img.shields.io/badge/dynamic/json?color=blue&label=Months&query=%24.fields.Months&url=https%3A%2F%2Fapi.airtable.com%2Fv0%2FappsLZAPESjpqzA3Z%2FStats%2FrecDeI3lBbnwQJhkG%3Fapi_key%3DkeyUIdeexo613U2Nn&&style=for-the-badge)]() [![](https://img.shields.io/badge/dynamic/json?color=blue&label=Years&query=%24.fields.Years&url=https%3A%2F%2Fapi.airtable.com%2Fv0%2FappsLZAPESjpqzA3Z%2FStats%2FrecDeI3lBbnwQJhkG%3Fapi_key%3DkeyUIdeexo613U2Nn&&style=for-the-badge)]()
+#What is it? 
 
 Google Docs plugin that converts Google Doc to simple HTML that can be used in various blogs.
 
