@@ -19,3 +19,8 @@ function clearBookmarks() {
         }
     }
 }
+function countWords(text){
+    let removeChar = text.replace(/[^A-Za-z]\s+/g, " ");
+    let newWord = removeChar.trim().split(" ");
+    return newWord.length;
+}

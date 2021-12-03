@@ -498,12 +498,35 @@ function processItem(doc, item, options) {
     return output.join('');
 }
 
+function updateStatistics(doc) {
+    let oldStats = getStats();
+    var warnings = 0;
+    var errors = 0;
+    messages.forEach(function (message) {
+        if (message.type === "warning") {
+            warnings++;
+        } else if (message.type === "error") {
+            errors++;
+        }
+    });
+    var stats = {
+        "Words": oldStats["Words"] + countWords(doc.getText()),
+        "Chars": oldStats["Chars"] + doc.getText().length,
+        "Images": oldStats["Images"] + doc.getImages().length,
+        "Documents": oldStats["Documents"] + 1,
+        "Warnings": oldStats["Warnings"] + warnings,
+        "Errors": oldStats["Errors"] + errors
+    }
+    updateStats(stats);
+}
+
 function processDocument(doc, options) {
     clearBookmarks();
     var selection = DocumentApp.getActiveDocument().getSelection();
     if (selection) {
         var body = rebuildItem(doc, selection, options);
         var html = processItem(doc, body, options).trim();
+        updateStatistics(doc);
         return {
             html: html,
             json: JSON.stringify(body)
@@ -512,6 +535,7 @@ function processDocument(doc, options) {
         checkTitle(doc, options);
         var body = rebuildItem(doc, doc.getBody(), options);
         var html = processItem(doc, body, options).trim();
+        updateStatistics(doc);
         return {
             html: html,
             json: JSON.stringify(body)
