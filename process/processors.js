@@ -427,6 +427,7 @@ function rebuildItem(doc, item, options) {
         for (var i = 0; i < numChildren; i++) {
             var child = item.getRangeElements ? item.getRangeElements()[i].getElement() : item.getChild(i);
             if (child !== null) {
+                var previous = child.getPreviousSibling()
                 var childItem = rebuildItem(doc, child, options);
                 if (child.getType() === DocumentApp.ElementType.LIST_ITEM) {
                     var listId = child.getListId();
@@ -443,7 +444,7 @@ function rebuildItem(doc, item, options) {
                         listIndex[listId] = newList;
                         childs.push(listIndex[listId]);
                     }
-                } else if (child.getIndentStart && child.getIndentStart() !== null && child.getIndentStart() !== 0) {
+                } else if (child.getIndentStart && child.getIndentStart() !== null && child.getIndentStart() !== 0 && previous !== null && (previous.getIndentStart() !== null && previous.getIndentStart() > 0)) {
                     if (lastListId) {
                         var listItems = listIndex[lastListId];
                         addToList(listItems, childItem);
