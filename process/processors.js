@@ -375,7 +375,7 @@ function addToList(list, child) {
 
 }
 
-function rebuildItem(doc, item, options) {
+function rebuildItem(doc, item, options, baseIndent) {
     var childs = [];
     var newItem = {};
 
@@ -394,9 +394,7 @@ function rebuildItem(doc, item, options) {
     if (item.getGlyphType) {
         newItem["glyph"] = item.getGlyphType();
     }
-    if (item.getIndentStart && item.getIndentStart() !== null) {
-        newItem["indent"] = item.getIndentStart();
-    }
+
     if (item.getHeading && item.getHeading() !== null) {
         newItem["heading"] = item.getHeading().toString();
     }
@@ -422,13 +420,16 @@ function rebuildItem(doc, item, options) {
         }
         newItem["attributes"] = attributes;
     }
+    if (item.getIndentStart && item.getIndentStart() !== null) {
+        newItem["indent"] = item.getIndentStart() - baseIndent;
+    }
     if (item.getNumChildren || item.getRangeElements) {
         var numChildren = item.getRangeElements ? item.getRangeElements().length : item.getNumChildren();
         for (var i = 0; i < numChildren; i++) {
             var child = item.getRangeElements ? item.getRangeElements()[i].getElement() : item.getChild(i);
             if (child !== null) {
                 var previous = child.getPreviousSibling()
-                var childItem = rebuildItem(doc, child, options);
+                var childItem = rebuildItem(doc, child, options, baseIndent);
                 if (child.getType() === DocumentApp.ElementType.LIST_ITEM) {
                     var listId = child.getListId();
                     lastListId = listId;
@@ -444,7 +445,7 @@ function rebuildItem(doc, item, options) {
                         listIndex[listId] = newList;
                         childs.push(listIndex[listId]);
                     }
-                } else if (child.getIndentStart && child.getIndentStart() !== null && child.getIndentStart() !== 0 && previous !== null && (previous.getIndentStart() !== null && previous.getIndentStart() > 0)) {
+                } else if (child.getIndentStart && child.getIndentStart() !== null && (child.getIndentStart() - baseIndent) > 0 && previous !== null && (previous.getIndentStart() !== null && (previous.getIndentStart()-baseIndent > 0))) {
                     if (lastListId) {
                         var listItems = listIndex[lastListId];
                         addToList(listItems, childItem);
@@ -524,8 +525,25 @@ function updateStatistics(doc) {
 function processDocument(doc, options) {
     clearBookmarks();
     var selection = DocumentApp.getActiveDocument().getSelection();
+
+    var baseIndent = 0;
+    // This part looks like a hack, though it isn't. We need to somehow get the base indent - it looks like this approach works (at least it does not introduce regressions).
+    if (doc.getBody() !== null) {
+        var body = doc.getBody();
+        var numberOfBodyChildren = body.getNumChildren();
+        if (numberOfBodyChildren > 0) {
+            var firstChild = body.getChild(0);
+            if (firstChild.getIndentStart && firstChild.getIndentStart() !== null && firstChild.getIndentStart() > 0) {
+                baseIndent = firstChild.getIndentStart();
+
+                var position = doc.newPosition(body, 0);
+                showMessage(doc, position, "warning", "It looks like this document has a custom indent. You'd better set it to zero - why do you need a bigger margin on the left at all?");
+            }
+        }
+    }
+
     if (selection) {
-        var body = rebuildItem(doc, selection, options);
+        var body = rebuildItem(doc, selection, options, baseIndent);
         var html = processItem(doc, body, options).trim();
         updateStatistics(doc);
         return {
@@ -534,7 +552,7 @@ function processDocument(doc, options) {
         }
     } else {
         checkTitle(doc, options);
-        var body = rebuildItem(doc, doc.getBody(), options);
+        var body = rebuildItem(doc, doc.getBody(), options, baseIndent);
         var html = processItem(doc, body, options).trim();
         updateStatistics(doc);
         return {
