@@ -18,7 +18,7 @@ var OptionKeys = {
     HYPHENS: "hyphens",
     DASHES: "dashes"
 };
-
+var MODE = "release";
 var DEFAULT_SETTINGS = {
     "version": VERSION,
     "paragraphs": false,

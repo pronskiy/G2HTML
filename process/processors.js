@@ -501,6 +501,9 @@ function processItem(doc, item, options) {
 }
 
 function updateStatistics(doc) {
+    if(MODE !== "release"){
+        return;
+    }
     let oldStats = getStats();
     var warnings = 0;
     var errors = 0;

@@ -34,6 +34,7 @@ function doTest(fileName) {
         var file = files.next();
         var id = file.getId();
         var doc = DocumentApp.openById(id);
+        MODE = "test";
         var result = processDocument(doc, DEFAULT_SETTINGS);
         var html = result.html;
         var jsonFiles = DriveApp.getFoldersByName("G2HTML_TESTS").next().getFilesByName(fileName + "_dump.json");
@@ -42,7 +43,7 @@ function doTest(fileName) {
             jsonFile.setTrashed(true);
         }
         DriveApp.getFoldersByName("G2HTML_TESTS").next().createFile(fileName + "_dump.json", result.json);
-
+        MODE = "release";
         if (resultFiles.hasNext()) {
             var compare = resultFiles.next().getBlob().getDataAsString();
             var message;
