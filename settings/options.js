@@ -21,7 +21,7 @@ var OptionKeys = {
 var MODE = "release";
 var DEFAULT_SETTINGS = {
     "version": VERSION,
-    "paragraphs": false,
+    "paragraphs": true,
     "heading_ids": true,
     "gifs": false,
     "generate_images": true,
@@ -34,6 +34,12 @@ var DEFAULT_SETTINGS = {
     "spaces":true,
     "transform_image_width" : false,
     "max_image_width": "800",
+    "open_settings_on_start":false,
+    "title_case":true,
+    "title_case_headings":false,
+    "dashes":false,
+    "hyphens": false,
+    
     "idtemplates": [
         {
             "regexp" : "c\\+\\+",
@@ -93,7 +99,7 @@ var DEFAULT_SETTINGS = {
         },
         {
             "attributes": {
-                "UNDERLINE" : true,
+                "UNDERLINE": true,
                 "LINK_URL": null
             },
             "replacement": "<u>$TEXT$</u>"
@@ -103,11 +109,11 @@ var DEFAULT_SETTINGS = {
             "replacement": "<p><a class=\"jb-download-button\" href=\"some url\"><i class=\"download-icon\"></i>$1</a></p>"
         },
         {
-            "regexp":  "\\[html\\](.*)",
+            "regexp": "\\[html\\](.*)",
             "replacement": "$1"
         },
         {
-            "regexp":  "(.*)\\[\\/html\\]",
+            "regexp": "(.*)\\[\\/html\\]",
             "replacement": "$1"
         },
         {
@@ -117,13 +123,46 @@ var DEFAULT_SETTINGS = {
         {
             "regexp": "\\[more\\]",
             "replacement": "<!--more-->"
+        },
+        {
+            "attributes": {
+                "FONT_FAMILY": "Courier New"
+            },
+            "replacement": "<kbd>$TEXT$</kbd>"
+        },
+        {
+            "regexp": "\\[code\\]",
+            "replacement": "<pre class=\"theme:monokai whitespace-before:1 whitespace-after:1 lang:php decode:true toolbar:false nums:false\" >"
+        },
+        {
+            "regexp": "\\[/code\\]",
+            "replacement": "</pre>"
+        },
+        {
+            "regexp": "\\[q\\]",
+            "replacement": "<blockquote>"
+        },
+        {
+            "regexp": "\\[/q\\]",
+            "replacement": "</blockquote>"
+        },
+        {
+            "regexp": "\\[---\\]",
+            "replacement": "<hr />"
+        },
+        {
+            "regexp": "`(.*)`",
+            "replacement": "<code>$1</code>"
+        },
+        {
+            "regexp": "```php",
+            "replacement": "<pre class=\"theme:monokai whitespace-before:1 whitespace-after:1 lang:php decode:true toolbar:false nums:false\" >"
+        },
+        {
+            "regexp": "```",
+            "replacement": "</pre>"
         }
     ],
-    "open_settings_on_start":false,
-    "title_case":true,
-    "title_case_headings":true,
-    "dashes":false,
-    "hyphens": true
 };
 
 function saveSettings(options) {

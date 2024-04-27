@@ -501,6 +501,8 @@ function processItem(doc, item, options) {
 }
 
 function updateStatistics(doc) {
+    return; 
+    
     if(MODE !== "release"){
         return;
     }
